@@ -1,7 +1,7 @@
 import { prisma } from "@/framework/database/prisma"
 import { UserEntity } from "@/entities/user-entity"
-import { IUserRepository } from "@/business/repositories/user-repository"
-import { User } from "../database/prisma/config"
+import { InputFindBy, IUserRepository } from "@/business/repositories/user-repository"
+import { Prisma, User } from "@/framework/database/prisma/config"
 
 export class PrismaUserRepository implements IUserRepository {
   async create(input: { user: UserEntity }): Promise<UserEntity> {
@@ -28,9 +28,9 @@ export class PrismaUserRepository implements IUserRepository {
     )
   }
 
-  async getBy(input: { userId: string }): Promise<UserEntity> {
+  async getBy(input: InputFindBy): Promise<UserEntity> {
     const user = await prisma.user.findUniqueOrThrow({
-      where: { id: input.userId },
+      where: input as Prisma.UserWhereUniqueInput,
     })
 
     return new UserEntity(
