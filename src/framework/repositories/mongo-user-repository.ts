@@ -1,6 +1,6 @@
 import { prisma } from "@/framework/database/prisma"
 import { UserEntity } from "@/entities/user-entity"
-import { InputFindBy, IUserRepository } from "@/business/repositories/user-repository"
+import { InputFindBy, InputUpdateFields, IUserRepository } from "@/business/repositories/user-repository"
 import { Prisma, User } from "@/framework/database/prisma/config"
 
 export class PrismaUserRepository implements IUserRepository {
@@ -42,16 +42,10 @@ export class PrismaUserRepository implements IUserRepository {
     )
   }
 
-  async update(input: { user: UserEntity }): Promise<UserEntity> {
-    const user = input.user
-
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        name: user.name,
-        email: user.email,
-        updatedAt: new Date(),
-      },
+  async update(input: InputUpdateFields): Promise<UserEntity> {
+    const user = await prisma.user.update({
+      where: { id: input.id },
+      data: input.dataToUpdate,
     })
 
     return user
