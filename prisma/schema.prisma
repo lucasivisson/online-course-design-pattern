@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/framework/database/prisma/config"
 }
 
 datasource db {
@@ -14,10 +13,125 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  professor
+  student
+}
+
+enum PaymentMethod {
+  credit
+  pix
+  bankSlip
+}
+
+enum ClassType {
+  video
+  text
+  quiz
+}
+
 model User {
-  id        String   @id @map("_id")
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  role      Role
   name      String
   email     String   @unique
+  password  String
+  Course Course[]
+  Notification Notification[] @relation("SenderNotifications")
+  Post Post[] @relation("AuthorPosts")
+  Enrollments Enrollments[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Course {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String
+  price       Int
+  professorId String  @db.ObjectId
+  professor   User    @relation(fields: [professorId], references: [id])
+  modules     Module[]
+  posts       Post[]
+  Enrollments Enrollments[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Module {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  classes   Class[]
+  courseId  String?  @db.ObjectId
+  course    Course?  @relation(fields: [courseId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+type Class {
+  id          String
+  name        String
+  type        ClassType
+  videoUrl    String?
+  textContent String?
+  quizId      String?
+  createdAt   DateTime
+  updatedAt   DateTime
+}
+
+model Quiz {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  questions Question[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+type Question {
+  question      String
+  alternatives  String[]
+  correctAnswer Int
+}
+
+model Notification {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  message      String
+  senderId     String @db.ObjectId
+  sender       User   @relation("SenderNotifications", fields: [senderId], references: [id])
+  receiversIds String[]
+  readBy       String[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Post {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  message   String
+  courseId  String   @db.ObjectId
+  course    Course   @relation(fields: [courseId], references: [id])
+  authorId  String   @db.ObjectId
+  author    User     @relation("AuthorPosts", fields: [authorId], references: [id])
+  thread    Thread[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+type Thread {
+  authorId String
+  message  String
+}
+
+model Enrollments {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  finished            Boolean
+  finishedModulesIds  String[] @db.ObjectId
+  finishedClassesIds  String[] @db.ObjectId
+  paymentMethod       PaymentMethod
+  finalPrice          Int
+  courseId            String   @db.ObjectId
+  course              Course   @relation(fields: [courseId], references: [id])
+  studentId           String   @db.ObjectId
+  student             User     @relation(fields: [studentId], references: [id])
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }
