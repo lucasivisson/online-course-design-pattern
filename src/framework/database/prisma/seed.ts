@@ -15,7 +15,7 @@ async function main() {
   const students = [
     { name: "Emerson Lucena", email: "emerson.lucena@example.com" },
     { name: "Lucas Ivisson", email: "lucas.ivisson@example.com" },
-    { name: "Jamille Hellen", email: "jamille.hellen@example.com" },
+    { name: "Jamile Hellen", email: "jamile.hellen@example.com" },
     { name: "Yaslim Soares", email: "yaslim.soares@example.com" },
   ];
 
