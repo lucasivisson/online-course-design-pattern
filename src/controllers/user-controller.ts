@@ -1,7 +1,10 @@
 import { UserUseCase } from "@/business/use-cases/user/users-use-case";
 import { PrismaUserRepository } from "@/framework/repositories/mongo-user-repository";
-import { InputCreateUserDtoIsValid } from "@/business/dto/user/create-user-dto";
+import { InputCreateUserDto } from "@/business/dto/user/create-user-dto";
 import { NextRequest } from "next/server";
+import { plainToInstance } from "class-transformer";
+import { validate } from "class-validator";
+import { errorHandler } from "@/shared/http.errorHandler";
 
 export class UserController {
   private userUseCase: UserUseCase;
@@ -32,17 +35,10 @@ export class UserController {
     try {
       const user = await req.json();
 
-      if (!InputCreateUserDtoIsValid(user)) {
-        return new Response(
-          JSON.stringify({ error: "Dados de usuário inválido" }),
-          {
-            status: 422,
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-      }
+      const dto = plainToInstance(InputCreateUserDto, user);
+      const errors = await validate(dto);
+
+      if (errors.length > 0) return errorHandler(errors);
 
       const userCreated = await this.userUseCase.create(user);
 
