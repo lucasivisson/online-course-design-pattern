@@ -1,9 +1,9 @@
-import { UserEntity, RoleEnum } from "@/entities/user-entity";
+import { UserEntity } from "@/entities/user-entity";
 
 export interface InputCreateUserDto {
   name: string;
   email: string;
-  role: RoleEnum;
+  role: string;
   password: string;
 }
 
