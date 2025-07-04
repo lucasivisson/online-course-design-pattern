@@ -7,6 +7,7 @@ import {
 import { prisma } from "@/framework/database/prisma";
 import { IQuizRepository } from "@/business/repositories/quiz-repository";
 import { QuizEntity } from "@/entities/quiz-entity";
+import { isValidObjectId } from "@/shared/isObjectId";
 
 export class PrismaQuizRepository implements IQuizRepository {
   async list(): Promise<QuizEntity[]> {
@@ -31,6 +32,8 @@ export class PrismaQuizRepository implements IQuizRepository {
   }
 
   async get(input: InputGetQuizDto): Promise<QuizEntity | null> {
+    if (!isValidObjectId(input.quizId)) return null;
+
     const quiz = await prisma.quiz.findFirst({
       where: { id: input.quizId },
     });

@@ -1,36 +1,40 @@
 import "reflect-metadata";
 import {
-  InputCreateQuizDto,
-  InputDeleteQuizDto,
-  InputGetQuizDto,
-  InputUpdateQuizDto,
-} from "@/business/dto/quiz/quiz-dto";
+  InputCreateModuleDto,
+  InputDeleteModuleDto,
+  InputGetModuleDto,
+  InputUpdateModuleDto,
+} from "@/business/dto/module/module-dto";
 import { NextRequest } from "next/server";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
 import { errorHandler } from "@/shared/http.errorHandler";
-import { QuizUseCase } from "@/business/use-cases/quiz/quiz-use-case";
+import { ModuleUseCase } from "@/business/use-cases/module/module-use-case";
+import { PrismaModuleRepository } from "@/framework/repositories/prisma-module-repository";
 import { PrismaQuizRepository } from "@/framework/repositories/prisma-quiz-repository";
 
-export class QuizController {
-  private quizUseCase: QuizUseCase;
+export class ModuleController {
+  private moduleUseCase: ModuleUseCase;
 
   constructor() {
-    this.quizUseCase = new QuizUseCase(new PrismaQuizRepository());
+    this.moduleUseCase = new ModuleUseCase(
+      new PrismaModuleRepository(),
+      new PrismaQuizRepository()
+    );
   }
 
   async list() {
     try {
-      const quiz = await this.quizUseCase.list();
+      const data = await this.moduleUseCase.list();
 
-      return new Response(JSON.stringify({ quiz }), {
+      return new Response(JSON.stringify({ module: data }), {
         status: 200,
         headers: {
           "Content-Type": "application/json",
         },
       });
     } catch (error) {
-      console.error("Erro ao consultar quiz:", error);
+      console.error("Erro ao consultar módulo:", error);
       return new Response(
         JSON.stringify({
           message:
@@ -48,18 +52,18 @@ export class QuizController {
     }
   }
 
-  async get(data: InputGetQuizDto) {
+  async get(data: InputGetModuleDto) {
     try {
-      const dto = plainToInstance(InputGetQuizDto, data);
-      const quiz = await this.quizUseCase.get(dto);
-      return new Response(JSON.stringify({ quiz }), {
+      const dto = plainToInstance(InputGetModuleDto, data);
+      const response = await this.moduleUseCase.get(dto);
+      return new Response(JSON.stringify({ module: response }), {
         status: 200,
         headers: {
           "Content-Type": "application/json",
         },
       });
     } catch (error) {
-      console.error("Erro ao consultar quiz:", error);
+      console.error("Erro ao consultar módulo:", error);
       return new Response(
         JSON.stringify({
           message:
@@ -79,23 +83,24 @@ export class QuizController {
 
   async create(req: NextRequest) {
     try {
-      const quiz = await req.json();
+      const data = await req.json();
 
-      const dto = plainToInstance(InputCreateQuizDto, quiz);
+      const dto = plainToInstance(InputCreateModuleDto, data);
+
       const errors = await validate(dto);
 
       if (errors.length > 0) return errorHandler(errors);
 
-      const quizCreated = await this.quizUseCase.create(dto);
+      const moduleCreated = await this.moduleUseCase.create(dto);
 
-      return new Response(JSON.stringify({ ...quizCreated }), {
+      return new Response(JSON.stringify({ ...moduleCreated }), {
         status: 200,
         headers: {
           "Content-Type": "application/json",
         },
       });
     } catch (error) {
-      console.error("Erro ao criar quiz:", error);
+      console.error("Erro ao criar módulo:", error);
       return new Response(
         JSON.stringify({
           message:
@@ -113,25 +118,28 @@ export class QuizController {
     }
   }
 
-  async update(req: NextRequest, quizId: string) {
+  async update(req: NextRequest, moduleId: string) {
     try {
-      const quiz = await req.json();
+      const data = await req.json();
 
-      const dto = plainToInstance(InputUpdateQuizDto, { ...quiz, quizId });
+      const dto = plainToInstance(InputUpdateModuleDto, {
+        ...data,
+        moduleId,
+      });
       const errors = await validate(dto);
 
       if (errors.length > 0) return errorHandler(errors);
 
-      const quizUpdated = await this.quizUseCase.update(dto);
+      const moduleUpdated = await this.moduleUseCase.update(dto);
 
-      return new Response(JSON.stringify({ ...quizUpdated }), {
+      return new Response(JSON.stringify({ ...moduleUpdated }), {
         status: 200,
         headers: {
           "Content-Type": "application/json",
         },
       });
     } catch (error) {
-      console.error("Erro ao atualizar quiz:", error);
+      console.error("Erro ao atualizar módulo:", error);
       return new Response(
         JSON.stringify({
           message:
@@ -149,14 +157,14 @@ export class QuizController {
     }
   }
 
-  async delete(data: InputDeleteQuizDto) {
+  async delete(data: InputDeleteModuleDto) {
     try {
-      const dto = plainToInstance(InputDeleteQuizDto, data);
+      const dto = plainToInstance(InputDeleteModuleDto, data);
       const errors = await validate(dto);
 
       if (errors.length > 0) return errorHandler(errors);
 
-      await this.quizUseCase.delete(dto);
+      await this.moduleUseCase.delete(dto);
 
       return new Response(undefined, {
         status: 204,
@@ -165,7 +173,7 @@ export class QuizController {
         },
       });
     } catch (error) {
-      console.error("Erro ao excluir quiz:", error);
+      console.error("Erro ao excluir módulo:", error);
       return new Response(
         JSON.stringify({
           message:
