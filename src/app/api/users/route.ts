@@ -1,23 +1,7 @@
-import { PrismaUserRepository } from "@/framework/repositories/mongo-user-repository";
-import { ListUsersUseCase } from "@/business/use-cases/user/list-users-use-case";
+import { UserController } from "@/controllers/user-controller";
+import { NextRequest } from "next/server";
 
-export async function GET() {
-  try {
-    const userRepository = new PrismaUserRepository();
-    const listUsersUseCase = new ListUsersUseCase(userRepository);
+const controller = new UserController();
 
-    const users = await listUsersUseCase.execute();
-
-    return new Response(JSON.stringify({ users }), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  } catch (error) {
-    console.error("Erro ao consultar usuários:", error);
-    throw new Error(
-      error instanceof Error ? error.message : "An unknown error occurred."
-    );
-  }
-}
+export const GET = () => controller.list();
+export const POST = (req: NextRequest) => controller.create(req);
