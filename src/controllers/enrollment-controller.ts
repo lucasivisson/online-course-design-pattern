@@ -1,5 +1,5 @@
 import { PrismaEnrollmentsRepository } from "@/framework/repositories/mongo-enrollment-repository";
-import { InputCreateUserDto } from "@/business/dto/user/create-user-dto";
+import { InputBuyCourseDto } from "@/business/dto/enrollment/enrollment-dto";
 import { NextRequest } from "next/server";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
@@ -16,17 +16,21 @@ export class EnrollmentController {
     );
   }
 
-  async buyCourse(req: NextRequest) {
+  async buyCourse(req: NextRequest, courseId: string) {
     try {
       const userId = USER_ID;
       const data = await req.json();
 
-      const dto = plainToInstance(InputCreateUserDto, data);
+      const dto = plainToInstance(InputBuyCourseDto, data);
       const errors = await validate(dto);
 
       if (errors.length > 0) return errorHandler(errors);
 
-      const userCreated = await this.enrollmentUseCase.buyCourse(userId, data);
+      const userCreated = await this.enrollmentUseCase.buyCourse(
+        courseId,
+        userId,
+        dto
+      );
 
       return new Response(JSON.stringify({ ...userCreated }), {
         status: 200,

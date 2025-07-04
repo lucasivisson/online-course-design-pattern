@@ -1,7 +1,14 @@
-import { UserController } from "@/controllers/user-controller";
+import { EnrollmentController } from "@/controllers/enrollment-controller";
 import { NextRequest } from "next/server";
 
-const controller = new UserController();
+const controller = new EnrollmentController();
 
-export const GET = () => controller.list();
-export const POST = (req: NextRequest) => controller.create(req);
+interface Params {
+  params: Promise<{ courseId: string }>;
+}
+export const POST =
+  (req: NextRequest, { params }: Params) =>
+  async () => {
+    const { courseId } = await params;
+    return controller.buyCourse(req, courseId);
+  };
