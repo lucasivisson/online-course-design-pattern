@@ -9,10 +9,10 @@ export interface CourseEntity {
   description: string;
   price: number;
   professorId: string;
-  professor: UserEntity;
-  modules: ModuleEntity[];
-  posts: PostEntity[];
-  Enrollments: EnrollmentEntity[];
+  professor?: UserEntity;
+  modules?: ModuleEntity[];
+  posts?: PostEntity[];
+  Enrollments?: Omit<EnrollmentEntity, "course">[];
   createdAt: Date;
   updatedAt: Date;
 }

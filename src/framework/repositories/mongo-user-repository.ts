@@ -5,6 +5,7 @@ import {
   IUserRepository,
 } from "@/business/repositories/user-repository";
 import { Prisma, User } from "@prisma/client";
+import { isValidObjectId } from "@/shared/isObjectId";
 
 export class PrismaUserRepository implements IUserRepository {
   async create(data: User): Promise<User> {
@@ -19,7 +20,10 @@ export class PrismaUserRepository implements IUserRepository {
     return users;
   }
 
-  async getBy(input: InputFindBy): Promise<User> {
+  async getBy(input: InputFindBy): Promise<User | null> {
+    console.log(input.id);
+    if (!isValidObjectId(input?.id)) return null;
+
     const user = await prisma.user.findUniqueOrThrow({
       where: input as Prisma.UserWhereUniqueInput,
     });

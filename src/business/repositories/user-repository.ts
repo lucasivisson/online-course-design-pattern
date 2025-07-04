@@ -10,6 +10,6 @@ export type InputUpdateFields = {
 export interface IUserRepository {
   create(input: InputCreateUserDto): Promise<UserEntity>;
   list(): Promise<UserEntity[]>;
-  getBy(input: InputFindBy): Promise<UserEntity>;
+  getBy(input: InputFindBy): Promise<UserEntity | null>;
   update(input: InputUpdateFields): Promise<UserEntity>;
 }
