@@ -1,21 +1,23 @@
 import { prisma } from "@/framework/database/prisma";
 import {
   InputFindBy,
+  InputGetManyById,
   InputUpdateFields,
   IUserRepository,
 } from "@/business/repositories/user-repository";
 import { Prisma, User } from "@prisma/client";
 import { isValidObjectId } from "@/shared/isObjectId";
+import { UserEntity } from "@/entities/user-entity";
 
 export class PrismaUserRepository implements IUserRepository {
-  async create(data: User): Promise<User> {
+  async create(data: User): Promise<UserEntity> {
     return await prisma.user.create({
       data,
     });
   }
 
   async list(): Promise<User[]> {
-    const users: User[] = await prisma.user.findMany();
+    const users = await prisma.user.findMany();
 
     return users;
   }
@@ -31,7 +33,15 @@ export class PrismaUserRepository implements IUserRepository {
     return user;
   }
 
-  async update(input: InputUpdateFields): Promise<User> {
+  async getManyById(input: InputGetManyById): Promise<UserEntity[]> {
+    const user = await prisma.user.findMany({
+      where: { id: { in: input.userIds } },
+    });
+
+    return user;
+  }
+
+  async update(input: InputUpdateFields): Promise<UserEntity> {
     const user = await prisma.user.update({
       where: { id: input.id },
       data: input.dataToUpdate,

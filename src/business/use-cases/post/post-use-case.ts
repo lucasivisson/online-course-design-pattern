@@ -2,7 +2,7 @@ import { InputAddThreadToPostDto, InputCreatePostDto, InputDeletePostDto, Output
 import { PostIsNotFromAuthor, PostNotFound } from "@/business/errors/posts"
 import { IPostRepository } from "@/business/repositories/post-respository"
 
-export class CreatePostUseCase {
+export class PostUseCase {
   constructor(private postRepository: IPostRepository) {}
 
   async create(input: InputCreatePostDto): Promise<OutputCreatePostDto> {

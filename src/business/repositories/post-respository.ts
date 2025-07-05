@@ -1,10 +1,15 @@
 import { PostEntity } from "@/entities/post-entity"
 
 export type InputCreateUpdatePost = {
-  message: string,
+  message: string | null,
   courseId: string,
   authorId: string,
-  thread: { authorId: string; message: string; }[]
+  file: { fileBuffer: Uint8Array, fileName: string, type: string } | null
+  thread: { authorId: string, message: string | null, file: {
+      fileBuffer: Uint8Array;
+      fileName: string;
+      type: string;
+    } | null }[]
 }
 
 export type InputUpdatePost = {
