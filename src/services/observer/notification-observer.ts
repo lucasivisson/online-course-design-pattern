@@ -1,5 +1,3 @@
-// services/notificationService.ts
-// (Conteúdo anterior do notificationService.ts)
 // Ele ainda será responsável por gerenciar os observadores e criar notificações no DB.
 // A lógica para `getCourseNotificationSubject` deve ser singleton global.
 import { ICourseRepository } from '@/business/repositories/course-repository';
@@ -13,9 +11,7 @@ import { PrismaNotificationRepository } from '@/framework/repositories/prisma-no
 interface INotificationObserver {
   attach(userIds: string[]): Promise<void>;
   detach(userId: string): void;
-  notify(message: string, senderId: string, 
-    // relatedEntityId?: string
-  ): Promise<NotificationEntity | void>;
+  notify(message: string, senderId: string): Promise<NotificationEntity | void>;
 }
 
 class NotificationObserver implements INotificationObserver {
@@ -50,7 +46,6 @@ class NotificationObserver implements INotificationObserver {
   public async notify(
     message: string,
     senderId: string,
-    // relatedEntityId?: string
   ): Promise<NotificationEntity | void > {
     if (this.observers.length === 0) {
       console.log('Nenhum observador para notificar.');
@@ -73,8 +68,6 @@ class NotificationObserver implements INotificationObserver {
   public async refreshObservers(): Promise<void> {
     const course = await this.courseRepository.get({
       courseId: this.courseId
-      // where: { id: this.courseId },
-      // include: { students: true, teachers: true },
     });
 
     if (course) {

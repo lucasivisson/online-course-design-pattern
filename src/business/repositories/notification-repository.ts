@@ -6,6 +6,11 @@ export type InputCreateNotification = {
   receiversIds: string[]
 }
 
+export type InputFindByReceiverId = {
+  userId: string
+}
+
 export interface INotificationRepository {
   create(input: InputCreateNotification): Promise<NotificationEntity>
+  findManyByReceiverId(input: InputFindByReceiverId): Promise<NotificationEntity[]>
 }

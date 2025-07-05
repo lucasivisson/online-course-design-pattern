@@ -1,7 +1,8 @@
+import { FileEntity } from "@/entities/file-entity";
 import { Mediator } from "./mediator-interface";
 import { BaseComponent } from "./mediator-interface";
 
-type FileInput = { fileBuffer: Buffer; filename: string; type: string; };
+type FileInput = FileEntity 
 
 /**
  * Componente responsável por iniciar a criação de um Post.

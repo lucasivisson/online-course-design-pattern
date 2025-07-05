@@ -1,5 +1,5 @@
 import { prisma } from "@/framework/database/prisma"
-import { INotificationRepository, InputCreateNotification } from "@/business/repositories/notification-repository"
+import { INotificationRepository, InputCreateNotification, InputFindByReceiverId } from "@/business/repositories/notification-repository"
 import { NotificationEntity } from "@/entities/notification-entity"
 
 export class PrismaNotificationRepository implements INotificationRepository {
@@ -11,11 +11,11 @@ export class PrismaNotificationRepository implements INotificationRepository {
     return post
   }
 
-  async findByReceiverId(userId: string): Promise<NotificationEntity[]> {
+  async findManyByReceiverId(input: InputFindByReceiverId): Promise<NotificationEntity[]> {
     const notifications = await prisma.notification.findMany({
       where: {
         receiversIds: {
-          has: userId,
+          has: input.userId,
         },
       },
       orderBy: {

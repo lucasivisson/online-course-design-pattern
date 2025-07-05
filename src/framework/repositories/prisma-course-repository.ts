@@ -1,6 +1,6 @@
 import { prisma } from "@/framework/database/prisma";
 
-import { ICourseRepository } from "@/business/repositories/course-repository";
+import { ICourseRepository, InputGetCourseBy } from "@/business/repositories/course-repository";
 import { CourseEntity } from "@/entities/course-entity";
 import {
   InputCreateCourseDto,
@@ -9,6 +9,7 @@ import {
   InputUpdateCourseDto,
 } from "@/business/dto/course/course-dto";
 import { isValidObjectId } from "@/shared/isObjectId";
+import { Prisma } from "@prisma/client";
 
 export class PrismaCourseRepository implements ICourseRepository {
   async list(): Promise<CourseEntity[]> {
@@ -96,6 +97,12 @@ export class PrismaCourseRepository implements ICourseRepository {
   async delete(input: InputDeleteCourseDto): Promise<void> {
     await prisma.course.delete({
       where: { id: input.courseId },
+    });
+  }
+
+  async getBy(input: InputGetCourseBy): Promise<CourseEntity | null> {
+    return await prisma.course.findUniqueOrThrow({
+      where: input as Prisma.CourseWhereUniqueInput,
     });
   }
 }
