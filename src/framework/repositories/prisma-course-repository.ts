@@ -1,6 +1,9 @@
 import { prisma } from "@/framework/database/prisma";
 
-import { ICourseRepository, InputGetCourseBy } from "@/business/repositories/course-repository";
+import {
+  ICourseRepository,
+  InputGetCourseBy,
+} from "@/business/repositories/course-repository";
 import { CourseEntity } from "@/entities/course-entity";
 import {
   InputCreateCourseDto,
@@ -101,7 +104,12 @@ export class PrismaCourseRepository implements ICourseRepository {
   }
 
   async getBy(input: InputGetCourseBy): Promise<CourseEntity | null> {
-    return await prisma.course.findUniqueOrThrow({
+    // Validate ObjectId if id is provided
+    if (input.id && !isValidObjectId(input.id)) {
+      return null;
+    }
+
+    return await prisma.course.findUnique({
       where: input as Prisma.CourseWhereUniqueInput,
     });
   }

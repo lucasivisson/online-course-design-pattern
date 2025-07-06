@@ -5,7 +5,8 @@ const controller = new PostController();
 
 export const GET = (
   _req: NextRequest,
-  { params }: { params: { userId: string; courseId: string } }) => {
+  { params }: { params: { userId: string; courseId: string } }
+) => {
   const { userId, courseId } = params;
-  return controller.list(userId, courseId)
-}
+  return controller.list(userId, courseId);
+};

@@ -3,16 +3,19 @@ import { InputBuyCourseDto } from "@/business/dto/enrollment/enrollment-dto";
 import { NextRequest } from "next/server";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
-import { errorHandler } from "@/shared/http.errorHandler";
+import { errorHandler, handleSuccess } from "@/shared/http-handler";
 import { USER_ID } from "@/shared/constants";
 import { EnrollmentUseCase } from "@/business/use-cases/enrollment/enrollment-use-case";
+import { PrismaCourseRepository } from "@/framework/repositories/prisma-course-repository";
+import { handleError } from "@/shared/http-handler";
 
 export class EnrollmentController {
   private enrollmentUseCase: EnrollmentUseCase;
 
   constructor() {
     this.enrollmentUseCase = new EnrollmentUseCase(
-      new PrismaEnrollmentsRepository()
+      new PrismaEnrollmentsRepository(),
+      new PrismaCourseRepository()
     );
   }
 
@@ -23,6 +26,7 @@ export class EnrollmentController {
 
       const dto = plainToInstance(InputBuyCourseDto, data);
       const errors = await validate(dto);
+      console.log("test");
 
       if (errors.length > 0) return errorHandler(errors);
 
@@ -32,17 +36,10 @@ export class EnrollmentController {
         dto
       );
 
-      return new Response(JSON.stringify({ ...userCreated }), {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      return handleSuccess(userCreated);
     } catch (error) {
-      console.error("Erro ao consultar usuários:", error);
-      throw new Error(
-        error instanceof Error ? error.message : "An unknown error occurred."
-      );
+      console.error("Erro ao comprar curso:", error);
+      return handleError(error);
     }
   }
 }

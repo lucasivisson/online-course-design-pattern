@@ -48,7 +48,7 @@ model Course {
   id          String        @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String
-  price       Int
+  price       Float
   professorId String        @db.ObjectId
   professor   User          @relation(fields: [professorId], references: [id])
   modules     Module[]
@@ -135,7 +135,7 @@ model Enrollments {
   finishedModulesIds String[]      @db.ObjectId
   finishedClassesIds String[]      @db.ObjectId
   paymentMethod      PaymentMethod
-  finalPrice         Int
+  finalPrice         Float
   courseId           String        @db.ObjectId
   course             Course        @relation(fields: [courseId], references: [id])
   studentId          String        @db.ObjectId

@@ -6,9 +6,8 @@ const controller = new EnrollmentController();
 interface Params {
   params: Promise<{ courseId: string }>;
 }
-export const POST =
-  (req: NextRequest, { params }: Params) =>
-  async () => {
-    const { courseId } = await params;
-    return controller.buyCourse(req, courseId);
-  };
+
+export const POST = async (req: NextRequest, { params }: Params) => {
+  const { courseId } = await params;
+  return await controller.buyCourse(req, courseId);
+};
