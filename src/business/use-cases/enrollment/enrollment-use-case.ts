@@ -7,6 +7,7 @@ import { ICourseRepository } from "@/business/repositories/course-repository";
 import { notFoundError } from "@/shared/http-handler";
 import { validationError } from "@/shared/http-handler";
 import { PaymentStrategyFactory } from "@/business/strategies/payment-strategy";
+import { ProgressService } from "@/business/chain/progress-handler";
 
 export class EnrollmentUseCase {
   constructor(
@@ -66,6 +67,18 @@ export class EnrollmentUseCase {
       throw notFoundError("Matrícula não encontrada.");
     }
 
+    const progressService = new ProgressService(course.modules || []);
+
+    if (!progressService.canAccessClass(enrollment, classId)) {
+      throw validationError(
+        "Você precisa completar as aulas anteriores antes de acessar esta aula."
+      );
+    }
+
+    if (enrollment.finishedClassesIds.includes(classId)) {
+      throw validationError("Aula já completada.");
+    }
+
     const foundModuleWithClass = course?.modules?.find((module) =>
       module.classes.some((classItem) => classItem.id === classId)
     );
@@ -74,16 +87,19 @@ export class EnrollmentUseCase {
       throw notFoundError("Aula não encontrada no curso.");
     }
 
-    if (enrollment.finishedClassesIds.includes(classId)) {
-      throw validationError("Aula já completada.");
-    }
+    const allClassesInModuleCompleted = foundModuleWithClass.classes.every(
+      (classItem) =>
+        enrollment.finishedClassesIds.includes(classItem.id) ||
+        classItem.id === classId
+    );
 
-    const isModuleFinished =
-      enrollment.finishedClassesIds.length ===
-      foundModuleWithClass.classes.length;
-
+    const isModuleFinished = allClassesInModuleCompleted;
     const isCourseFinished =
-      enrollment.finishedModulesIds.length === course.modules?.length;
+      course.modules?.every(
+        (module) =>
+          enrollment.finishedModulesIds.includes(module.id) ||
+          (module.id === foundModuleWithClass.id && isModuleFinished)
+      ) ?? false;
 
     return await this.enrollmentRepository.updateBy({
       id: enrollment.id,
