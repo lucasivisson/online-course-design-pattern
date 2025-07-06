@@ -10,7 +10,7 @@ import {
   OutputUpdateCourseDto,
 } from "@/business/dto/course/course-dto";
 import { ICourseRepository } from "@/business/repositories/course-repository";
-import { ModuleUseCase } from "../module/module-use-case";
+import { ModuleUseCase } from "@/business/use-cases/module/module-use-case";
 import { IUserRepository } from "@/business/repositories/user-repository";
 
 export class CourseUseCase {
@@ -35,7 +35,10 @@ export class CourseUseCase {
     if (data.modules) {
       for (let index = 0; index < data.modules.length; index++) {
         const element = data.modules[index];
-        await this.moduleUseCase.create({ ...element, courseId: course.id });
+        await this.moduleUseCase.create({
+          ...element,
+          coursesIds: [course.id],
+        });
       }
     }
 
@@ -57,7 +60,10 @@ export class CourseUseCase {
     if (data.modules) {
       for (let index = 0; index < data.modules.length; index++) {
         const element = data.modules[index];
-        await this.moduleUseCase.create({ ...element, courseId: course.id });
+        await this.moduleUseCase.create({
+          ...element,
+          coursesIds: [course.id],
+        });
       }
     }
 

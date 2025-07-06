@@ -3,16 +3,18 @@ import { NextRequest } from "next/server";
 
 const controller = new PostController();
 
-export const UPDATE = (
+export const PUT = async (
   req: NextRequest,
-  { params }: { params: { userId: string; postId: string } }) => {
-  const { userId, postId } = params;
-  return controller.addThreadOnPost(req, userId, postId)
-}
+  { params }: { params: Promise<{ userId: string; postId: string }> }
+) => {
+  const { userId, postId } = await params;
+  return controller.addThreadOnPost(req, userId, postId);
+};
 
-export const DELETE = (
+export const DELETE = async (
   _req: NextRequest,
-  { params }: { params: { userId: string; postId: string } }) => {
-  const { userId, postId } = params;
-  return controller.delete(userId, postId)
-}
+  { params }: { params: Promise<{ userId: string; postId: string }> }
+) => {
+  const { userId, postId } = await params;
+  return controller.delete(userId, postId);
+};

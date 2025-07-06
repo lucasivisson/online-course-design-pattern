@@ -3,10 +3,10 @@ import { NextRequest } from "next/server";
 
 const controller = new PostController();
 
-export const GET = (
+export const GET = async (
   _req: NextRequest,
-  { params }: { params: { userId: string; courseId: string } }
+  { params }: { params: Promise<{ userId: string; courseId: string }> }
 ) => {
-  const { userId, courseId } = params;
+  const { userId, courseId } = await params;
   return controller.list(userId, courseId);
 };

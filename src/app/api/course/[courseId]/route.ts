@@ -4,14 +4,20 @@ import { NextRequest } from "next/server";
 const controller = new CourseController();
 
 type Params = {
-  params: {
+  params: Promise<{
     courseId: string;
-  };
+  }>;
 };
 
-export const GET = (_: NextRequest, { params }: Params) =>
-  controller.get({ courseId: params.courseId });
-export const DELETE = (_: NextRequest, { params }: Params) =>
-  controller.delete({ courseId: params.courseId });
-export const PUT = (req: NextRequest, { params }: Params) =>
-  controller.update(req, params.courseId);
+export const GET = async (_: NextRequest, { params }: Params) => {
+  const { courseId } = await params;
+  return controller.get({ courseId });
+};
+export const DELETE = async (_: NextRequest, { params }: Params) => {
+  const { courseId } = await params;
+  return controller.delete({ courseId });
+};
+export const PUT = async (req: NextRequest, { params }: Params) => {
+  const { courseId } = await params;
+  return controller.update(req, courseId);
+};
