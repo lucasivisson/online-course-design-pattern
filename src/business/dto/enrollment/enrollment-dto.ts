@@ -13,10 +13,18 @@ export interface CreateEnrollment extends InputBuyCourseDto {
   studentId: string;
 }
 
+import { IsOptional, IsNumber, Min, Max } from "class-validator";
+
 export class InputBuyCourseDto {
   @IsString()
   @IsIn(PaymentMethods)
   paymentMethod: PaymentMethod;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  @Max(24)
+  installments?: number;
 }
 
 export type OutputBuyCourseDto = EnrollmentEntity;

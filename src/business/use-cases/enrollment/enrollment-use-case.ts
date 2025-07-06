@@ -4,9 +4,9 @@ import {
 } from "@/business/dto/enrollment/enrollment-dto";
 import { IEnrollmentRepository } from "@/business/repositories/enrollment-repository";
 import { ICourseRepository } from "@/business/repositories/course-repository";
-import { PaymentMethod } from "@/entities/enrollment-entity";
 import { notFoundError } from "@/shared/http-handler";
 import { validationError } from "@/shared/http-handler";
+import { PaymentStrategyFactory } from "@/business/strategies/payment-strategy";
 
 export class EnrollmentUseCase {
   constructor(
@@ -33,28 +33,22 @@ export class EnrollmentUseCase {
       throw notFoundError("Curso já comprado.");
     }
 
-    console.log(
-      "enrollment",
-      this.calculateFinalPrice(data.paymentMethod, course.price)
+    const paymentStrategy = PaymentStrategyFactory.createStrategy(
+      data.paymentMethod,
+      data.installments
     );
+
+    const finalPrice = paymentStrategy.calculateFinalPrice(course.price);
 
     return await this.enrollmentRepository.create({
       paymentMethod: data.paymentMethod,
       courseId,
-      finalPrice: this.calculateFinalPrice(data.paymentMethod, course.price),
+      finalPrice,
       finished: false,
       finishedModulesIds: [],
       finishedClassesIds: [],
       studentId: userId,
     });
-  }
-
-  calculateFinalPrice(paymentMethod: PaymentMethod, price: number) {
-    if (paymentMethod === "pix") {
-      return price * 0.95;
-    }
-
-    return price;
   }
 
   async completeClass(courseId: string, userId: string, classId: string) {
