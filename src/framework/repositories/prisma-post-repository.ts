@@ -1,5 +1,5 @@
 import { prisma } from "@/framework/database/prisma"
-import { InputCreateUpdatePost, InputDeletePostById, InputFindPostById, InputUpdatePost, IPostRepository } from "@/business/repositories/post-respository"
+import { InputCreateUpdatePost, InputDeletePostById, InputFindManyByCourseId, InputFindPostById, InputUpdatePost, IPostRepository } from "@/business/repositories/post-respository"
 import { PostEntity } from "@/entities/post-entity"
 
 export class PrismaPostRepository implements IPostRepository {
@@ -32,5 +32,13 @@ export class PrismaPostRepository implements IPostRepository {
     await prisma.post.delete({
       where: { id: input.postId },
     })
+  }
+
+  async findManyByCourseId(input: InputFindManyByCourseId): Promise<PostEntity[]> {
+    return await prisma.post.findMany({
+      where: {
+        courseId: input.courseId
+      }
+    });
   }
 }
