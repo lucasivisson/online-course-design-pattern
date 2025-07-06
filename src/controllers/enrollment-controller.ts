@@ -42,4 +42,21 @@ export class EnrollmentController {
       return handleError(error);
     }
   }
+
+  async completeClass(req: NextRequest, courseId: string, classId: string) {
+    try {
+      const userId = USER_ID;
+
+      const userCreated = await this.enrollmentUseCase.completeClass(
+        courseId,
+        userId,
+        classId
+      );
+
+      return handleSuccess(userCreated);
+    } catch (error) {
+      console.error("Erro ao completar aula:", error);
+      return handleError(error);
+    }
+  }
 }

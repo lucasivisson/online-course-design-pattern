@@ -19,7 +19,7 @@ export class PrismaCourseRepository implements ICourseRepository {
     return await prisma.course.findMany({
       include: {
         professor: true,
-        Enrollments: {
+        enrollments: {
           select: {
             id: true,
             finished: true,
@@ -34,7 +34,6 @@ export class PrismaCourseRepository implements ICourseRepository {
             studentId: true,
           },
         },
-        modules: true,
         posts: true,
       },
     });
@@ -74,7 +73,7 @@ export class PrismaCourseRepository implements ICourseRepository {
       where: { id: input.courseId },
       include: {
         professor: true,
-        Enrollments: {
+        enrollments: {
           select: {
             id: true,
             finished: true,
@@ -89,7 +88,6 @@ export class PrismaCourseRepository implements ICourseRepository {
             studentId: true,
           },
         },
-        modules: true,
         posts: true,
       },
     });
@@ -108,9 +106,55 @@ export class PrismaCourseRepository implements ICourseRepository {
     if (input.id && !isValidObjectId(input.id)) {
       return null;
     }
+    console.log(input);
 
     return await prisma.course.findUnique({
       where: input as Prisma.CourseWhereUniqueInput,
+      include: {
+        professor: true,
+        enrollments: {
+          select: {
+            id: true,
+            finished: true,
+            paymentMethod: true,
+            finalPrice: true,
+            student: true,
+            finishedClassesIds: true,
+            finishedModulesIds: true,
+            updatedAt: true,
+            createdAt: true,
+            courseId: true,
+            studentId: true,
+          },
+        },
+        posts: true,
+      },
+    });
+  }
+
+  async getById(id: string): Promise<CourseEntity | null> {
+    return await prisma.course.findUnique({
+      where: { id },
+      include: {
+        professor: true,
+        enrollments: {
+          select: {
+            id: true,
+            finished: true,
+            paymentMethod: true,
+            finalPrice: true,
+            student: true,
+            finishedClassesIds: true,
+            finishedModulesIds: true,
+            updatedAt: true,
+            createdAt: true,
+            courseId: true,
+            studentId: true,
+          },
+        },
+        posts: true,
+        modules: true,
+      },
     });
   }
 }

@@ -8,6 +8,8 @@ import { prisma } from "@/framework/database/prisma";
 import { IQuizRepository } from "@/business/repositories/quiz-repository";
 import { QuizEntity } from "@/entities/quiz-entity";
 import { isValidObjectId } from "@/shared/isObjectId";
+import { InputGetQuizBy } from "@/business/repositories/quiz-repository";
+import { Prisma } from "@prisma/client";
 
 export class PrismaQuizRepository implements IQuizRepository {
   async list(): Promise<QuizEntity[]> {
@@ -44,6 +46,16 @@ export class PrismaQuizRepository implements IQuizRepository {
   async delete(input: InputDeleteQuizDto): Promise<void> {
     await prisma.quiz.delete({
       where: { id: input.quizId },
+    });
+  }
+
+  async getBy(input: InputGetQuizBy): Promise<QuizEntity | null> {
+    if (input.id && !isValidObjectId(input.id)) {
+      return null;
+    }
+
+    return await prisma.quiz.findUnique({
+      where: input as Prisma.QuizWhereUniqueInput,
     });
   }
 }

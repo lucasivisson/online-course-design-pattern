@@ -9,7 +9,10 @@ import {
   InputDeleteQuizDto,
   OutputDeleteQuizDto,
 } from "@/business/dto/quiz/quiz-dto";
-import { IQuizRepository } from "@/business/repositories/quiz-repository";
+import {
+  InputGetQuizBy,
+  IQuizRepository,
+} from "@/business/repositories/quiz-repository";
 
 export class QuizUseCase {
   constructor(private quizRepository: IQuizRepository) {}
@@ -32,5 +35,9 @@ export class QuizUseCase {
 
   async delete(data: InputDeleteQuizDto): Promise<OutputDeleteQuizDto> {
     return await this.quizRepository.delete(data);
+  }
+
+  async getBy(data: InputGetQuizBy): Promise<OutputGetQuizDto> {
+    return await this.quizRepository.getBy(data);
   }
 }

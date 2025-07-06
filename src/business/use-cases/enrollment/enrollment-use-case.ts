@@ -6,6 +6,7 @@ import { IEnrollmentRepository } from "@/business/repositories/enrollment-reposi
 import { ICourseRepository } from "@/business/repositories/course-repository";
 import { PaymentMethod } from "@/entities/enrollment-entity";
 import { notFoundError } from "@/shared/http-handler";
+import { validationError } from "@/shared/http-handler";
 
 export class EnrollmentUseCase {
   constructor(
@@ -50,10 +51,53 @@ export class EnrollmentUseCase {
 
   calculateFinalPrice(paymentMethod: PaymentMethod, price: number) {
     if (paymentMethod === "pix") {
-      // Ensure the result is a proper float value
       return price * 0.95;
     }
 
     return price;
+  }
+
+  async completeClass(courseId: string, userId: string, classId: string) {
+    const course = await this.courseRepository.getById(courseId);
+
+    if (!course) {
+      throw notFoundError("Curso não encontrado.");
+    }
+
+    const enrollment = await this.enrollmentRepository.getBy({
+      studentId: userId,
+    });
+
+    if (!enrollment) {
+      throw notFoundError("Matrícula não encontrada.");
+    }
+
+    const foundModuleWithClass = course?.modules?.find((module) =>
+      module.classes.some((classItem) => classItem.id === classId)
+    );
+
+    if (!foundModuleWithClass) {
+      throw notFoundError("Aula não encontrada no curso.");
+    }
+
+    if (enrollment.finishedClassesIds.includes(classId)) {
+      throw validationError("Aula já completada.");
+    }
+
+    const isModuleFinished =
+      enrollment.finishedClassesIds.length ===
+      foundModuleWithClass.classes.length;
+
+    const isCourseFinished =
+      enrollment.finishedModulesIds.length === course.modules?.length;
+
+    return await this.enrollmentRepository.updateBy({
+      id: enrollment.id,
+      finished: isCourseFinished,
+      finishedClassesIds: [...enrollment.finishedClassesIds, classId],
+      finishedModulesIds: isModuleFinished
+        ? [...enrollment.finishedModulesIds, foundModuleWithClass.id]
+        : enrollment.finishedModulesIds,
+    });
   }
 }

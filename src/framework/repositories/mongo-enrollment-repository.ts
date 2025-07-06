@@ -27,4 +27,13 @@ export class PrismaEnrollmentsRepository implements IEnrollmentRepository {
       where: input as Prisma.EnrollmentsWhereUniqueInput,
     });
   }
+
+  async updateBy(input: InputGetEnrollmentBy): Promise<Enrollments | null> {
+    const { id, ...updateData } = input;
+
+    return await prisma.enrollments.update({
+      where: { id },
+      data: updateData,
+    });
+  }
 }
