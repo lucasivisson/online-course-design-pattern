@@ -1,10 +1,15 @@
 import { NextRequest } from "next/server";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
-import { errorHandler } from "@/shared/http.errorHandler";
+import { errorHandler } from "@/shared/http-handler";
 import { PostUseCase } from "@/business/use-cases/post/post-use-case";
 import { PrismaPostRepository } from "@/framework/repositories/prisma-post-repository";
-import { InputAddThreadToPostDto, InputCreatePostDto, InputDeletePostDto, InputListPostsDto } from "@/business/dto/posts/posts-dto";
+import {
+  InputAddThreadToPostDto,
+  InputCreatePostDto,
+  InputDeletePostDto,
+  InputListPostsDto,
+} from "@/business/dto/posts/posts-dto";
 
 export class PostController {
   private postUseCase: PostUseCase;
@@ -65,7 +70,11 @@ export class PostController {
     try {
       const thread = await req.json();
 
-      const dto = plainToInstance(InputAddThreadToPostDto, { userId, postId, thread });
+      const dto = plainToInstance(InputAddThreadToPostDto, {
+        userId,
+        postId,
+        thread,
+      });
       const errors = await validate(dto);
 
       if (errors.length > 0) return errorHandler(errors);

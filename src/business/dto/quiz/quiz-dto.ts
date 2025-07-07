@@ -9,8 +9,8 @@ import {
   ArrayMaxSize,
   Min,
 } from "class-validator";
-
 import { Type } from "class-transformer";
+
 export class QuestionDto {
   @IsString()
   @IsNotEmpty()

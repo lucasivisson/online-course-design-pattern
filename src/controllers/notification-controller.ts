@@ -1,7 +1,7 @@
 import { InputListNotificationsDto } from "@/business/dto/notification/notification-dto";
 import { NotificationUseCase } from "@/business/use-cases/notification/notification-use-case";
 import { PrismaNotificationRepository } from "@/framework/repositories/prisma-notification-repository";
-import { errorHandler } from "@/shared/http.errorHandler";
+import { errorHandler } from "@/shared/http-handler";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
 
@@ -9,7 +9,9 @@ export class NotificationController {
   private notificationUseCase: NotificationUseCase;
 
   constructor() {
-    this.notificationUseCase = new NotificationUseCase(new PrismaNotificationRepository());
+    this.notificationUseCase = new NotificationUseCase(
+      new PrismaNotificationRepository()
+    );
   }
 
   async list(userId: string) {

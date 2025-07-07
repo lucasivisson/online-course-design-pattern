@@ -4,7 +4,7 @@ import { InputCreateUserDto } from "@/business/dto/user/create-user-dto";
 import { NextRequest } from "next/server";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
-import { errorHandler } from "@/shared/http.errorHandler";
+import { errorHandler } from "@/shared/http-handler";
 
 export class UserController {
   private userUseCase: UserUseCase;

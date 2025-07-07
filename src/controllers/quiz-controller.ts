@@ -8,7 +8,7 @@ import {
 import { NextRequest } from "next/server";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
-import { errorHandler } from "@/shared/http.errorHandler";
+import { errorHandler } from "@/shared/http-handler";
 import { QuizUseCase } from "@/business/use-cases/quiz/quiz-use-case";
 import { PrismaQuizRepository } from "@/framework/repositories/prisma-quiz-repository";
 

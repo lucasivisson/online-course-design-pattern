@@ -4,14 +4,20 @@ import { NextRequest } from "next/server";
 const controller = new QuizController();
 
 type Params = {
-  params: {
+  params: Promise<{
     quizId: string;
-  };
+  }>;
 };
 
-export const GET = (_: NextRequest, { params }: Params) =>
-  controller.get({ quizId: params.quizId });
-export const DELETE = (_: NextRequest, { params }: Params) =>
-  controller.delete({ quizId: params.quizId });
-export const PUT = (req: NextRequest, { params }: Params) =>
-  controller.update(req, params.quizId);
+export const GET = async (_: NextRequest, { params }: Params) => {
+  const { quizId } = await params;
+  return controller.get({ quizId });
+};
+export const DELETE = async (_: NextRequest, { params }: Params) => {
+  const { quizId } = await params;
+  return controller.delete({ quizId });
+};
+export const PUT = async (req: NextRequest, { params }: Params) => {
+  const { quizId } = await params;
+  return controller.update(req, quizId);
+};

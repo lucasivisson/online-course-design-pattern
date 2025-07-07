@@ -37,9 +37,9 @@ model User {
   email        String         @unique
   password     String
   Course       Course[]
-  Notification Notification[] @relation("SenderNotifications")
+  notification Notification[] @relation("SenderNotifications")
   Post         Post[]         @relation("AuthorPosts")
-  Enrollments  Enrollments[]
+  enrollments  Enrollments[]
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
 }
@@ -48,12 +48,13 @@ model Course {
   id          String        @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String
-  price       Int
+  price       Float
   professorId String        @db.ObjectId
   professor   User          @relation(fields: [professorId], references: [id])
-  modules     Module[]
+  modulesIds  String[]      @db.ObjectId
+  modules     Module[]      @relation("CourseModules", fields: [modulesIds], references: [id])
   posts       Post[]
-  Enrollments Enrollments[]
+  enrollments Enrollments[]
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 }
@@ -62,11 +63,12 @@ model Module {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   name      String
   classes   Class[]
-  courseId  String?  @db.ObjectId
-  course    Course?  @relation(fields: [courseId], references: [id])
+  coursesIds String[] @db.ObjectId
+  courses   Course[] @relation("CourseModules", fields: [coursesIds], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
 
 type Class {
   id          String
@@ -133,9 +135,9 @@ model Enrollments {
   id                 String        @id @default(auto()) @map("_id") @db.ObjectId
   finished           Boolean
   finishedModulesIds String[]      @db.ObjectId
-  finishedClassesIds String[]      @db.ObjectId
+  finishedClassesIds String[]
   paymentMethod      PaymentMethod
-  finalPrice         Int
+  finalPrice         Float
   courseId           String        @db.ObjectId
   course             Course        @relation(fields: [courseId], references: [id])
   studentId          String        @db.ObjectId

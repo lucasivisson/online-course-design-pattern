@@ -1,6 +1,6 @@
-import { PaymentMethod } from "@prisma/client";
-import { CourseEntity } from "./course-entity";
-import { UserEntity } from "./user-entity";
+export const PaymentMethods = ["credit", "pix", "bankSlip"] as const;
+
+export type PaymentMethod = (typeof PaymentMethods)[number];
 
 export interface EnrollmentEntity {
   id: string;
@@ -10,9 +10,7 @@ export interface EnrollmentEntity {
   paymentMethod: PaymentMethod;
   finalPrice: number;
   courseId: string;
-  course: CourseEntity;
   studentId: string;
-  student: UserEntity;
   createdAt: Date;
   updatedAt: Date;
 }

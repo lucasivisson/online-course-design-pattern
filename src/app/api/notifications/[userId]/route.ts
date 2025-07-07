@@ -3,9 +3,10 @@ import { NextRequest } from "next/server";
 
 const controller = new NotificationController();
 
-export const GET = (
+export const GET = async (
   _req: NextRequest,
-  { params }: { params: { userId: string; } }) => {
-  const { userId } = params;
-  return controller.list(userId)
-}
+  { params }: { params: Promise<{ userId: string }> }
+) => {
+  const { userId } = await params;
+  return controller.list(userId);
+};
