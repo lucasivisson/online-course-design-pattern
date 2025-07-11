@@ -6,6 +6,7 @@ import {
   ValidateNested,
   IsInt,
   Min,
+  IsOptional,
 } from "class-validator";
 import { CourseEntity } from "@/entities/course-entity";
 import { InputCreateModuleDto } from "@/business/dto/module/module-dto";
@@ -47,17 +48,20 @@ export class InputUpdateCourseDto {
   description: string;
 
   @IsString()
+  @IsOptional()
   @IsNotEmpty()
-  professorId: string;
+  professorId?: string;
 
   @IsInt()
   @Min(0)
-  price: number;
+  @IsOptional()
+  price?: number;
 
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => InputCreateModuleDto)
-  modules: InputCreateModuleDto[];
+  @IsOptional()
+  modules?: InputCreateModuleDto[];
 }
 
 export class InputGetCourseDto {

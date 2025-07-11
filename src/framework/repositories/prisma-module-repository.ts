@@ -39,14 +39,16 @@ export class PrismaModuleRepository implements IModuleRepository {
       where: { id: input.moduleId },
       data: {
         name: input.name,
-        classes: input.classes.map((value) => {
-          return {
-            ...value,
-            id: uuidv4(),
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          };
-        }),
+        classes: input.classes
+          ? input.classes.map((value) => {
+              return {
+                ...value,
+                id: uuidv4(),
+                createdAt: new Date(),
+                updatedAt: new Date(),
+              };
+            })
+          : undefined,
       },
     });
 

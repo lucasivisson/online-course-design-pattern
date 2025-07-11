@@ -68,8 +68,9 @@ export class InputUpdateModuleDto {
 
   @IsArray()
   @ValidateNested({ each: true })
+  @IsOptional()
   @Type(() => ClassDto)
-  classes: ClassDto[];
+  classes?: ClassDto[];
 }
 
 export class InputGetModuleDto {
