@@ -35,6 +35,7 @@ export default async function CoursesPage() {
             </p>
           </div>
           <Button
+            href="/meus-cursos"
             variant="gray-50"
             className="flex border-0 items-center gap-2"
           >

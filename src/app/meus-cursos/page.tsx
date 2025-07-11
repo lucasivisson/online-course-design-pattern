@@ -33,7 +33,11 @@ export default async function CoursesPage() {
               Descubra novos conhecimentos e expanda suas habilidades
             </p>
           </div>
-          <Button variant="blue" className="flex border-0 items-center gap-2">
+          <Button
+            href="/cursos"
+            variant="blue"
+            className="flex border-0 items-center gap-2"
+          >
             <BookIcon className="w-5 h-5 text-white" />
             <span>Explorar Novos Cursos</span>
           </Button>

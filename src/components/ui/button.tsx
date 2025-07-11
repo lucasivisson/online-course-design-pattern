@@ -1,13 +1,18 @@
 import { cn } from "@/shared/utils";
 import { ButtonHTMLAttributes, forwardRef } from "react";
+import Link from "next/link";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "blue" | "gray-50";
   size?: "sm" | "md" | "lg";
+  href?: string;
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "blue", size = "md", children, ...props }, ref) => {
+  (
+    { className, variant = "blue", size = "md", children, href, ...props },
+    ref
+  ) => {
     const baseClasses =
       "font-semibold cursor-pointer rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2";
 
@@ -23,12 +28,23 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       lg: "px-6 py-3 text-lg",
     };
 
+    const buttonClasses = cn(
+      baseClasses,
+      variants[variant],
+      sizes[size],
+      className
+    );
+
+    if (href) {
+      return (
+        <Link href={href} className={buttonClasses}>
+          {children}
+        </Link>
+      );
+    }
+
     return (
-      <button
-        className={cn(baseClasses, variants[variant], sizes[size], className)}
-        ref={ref}
-        {...props}
-      >
+      <button className={buttonClasses} ref={ref} {...props}>
         {children}
       </button>
     );

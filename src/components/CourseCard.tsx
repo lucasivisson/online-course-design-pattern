@@ -39,7 +39,7 @@ export function CourseCard({ index, course, onClick }: CourseCardProps) {
         <div className="absolute text-sm top-3 left-3 text-black/70 px-2 py-0.5 bg-white rounded-lg">
           Programação
         </div>
-        <BookIcon className="w-12 h-12" />
+        <BookIcon className="w-12 h-12 text-gray-800" />
       </div>
       <div className="p-6">
         <div className="flex items-center justify-between mb-2">
@@ -57,11 +57,11 @@ export function CourseCard({ index, course, onClick }: CourseCardProps) {
         </p>
 
         <div className="flex items-center gap-4 text-sm text-gray-800">
-          <div className="flex gap-1">
+          <div className="flex gap-1 items-center">
             <StarIcon className="w-3 h-3" />
             <span>4.8</span>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1  items-center">
             <UsersIcon className="w-3 h-3" />
             <span>
               {course.enrollments?.length || 0}{" "}
