@@ -42,6 +42,7 @@ export class InputCreateModuleDto {
   name: string;
 
   @IsArray()
+  @IsOptional()
   @IsString({ each: true })
   coursesIds: string[];
 
@@ -57,6 +58,7 @@ export class InputUpdateModuleDto {
   moduleId: string;
 
   @IsArray()
+  @IsOptional()
   @IsString({ each: true })
   coursesIds: string[];
 

@@ -5,7 +5,7 @@ export interface ModuleEntity {
   id: string;
   name: string;
   classes: Class[];
-  courseId?: string | null;
+  coursesIds?: string[];
   course?: CourseEntity;
   createdAt: Date;
   updatedAt: Date;
