@@ -1,9 +1,8 @@
 import { CourseEntity } from "@/entities/course-entity";
-import { CourseCard } from "@/components/CourseCard";
 import { CourseService } from "@/services/course-service";
 import { Button } from "@/components/ui/button";
-import { Stats } from "@/components/ui/stats";
-import ArrowIcon from "@/assets/arrow.svg";
+import { ProgressCourseCard } from "@/components/ProgressCourseCard";
+import BookIcon from "@/assets/book.svg";
 
 export default async function CoursesPage() {
   const courses: CourseEntity[] = await CourseService.getCourses();
@@ -34,12 +33,9 @@ export default async function CoursesPage() {
               Descubra novos conhecimentos e expanda suas habilidades
             </p>
           </div>
-          <Button
-            variant="gray-50"
-            className="flex border-0 items-center gap-2"
-          >
-            <ArrowIcon className="w-4 h-4" />
-            <span>Voltar para Meus Cursos</span>
+          <Button variant="blue" className="flex border-0 items-center gap-2">
+            <BookIcon className="w-5 h-5 text-white" />
+            <span>Explorar Novos Cursos</span>
           </Button>
         </div>
 
@@ -50,21 +46,12 @@ export default async function CoursesPage() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {courses.map((course, index) => (
-              <CourseCard index={index} key={index} course={course} />
+              <ProgressCourseCard index={index} key={index} course={course} />
             ))}
           </div>
         )}
-
-        <Stats
-          className="mt-10"
-          items={[
-            { value: "50+", label: "Cursos Disponíveis", color: "blue" },
-            { value: "15k+", label: "Alunos Ativos", color: "green" },
-            { value: "4.8+", label: "Avaliação Média", color: "purple" },
-          ]}
-        />
       </div>
     </div>
   );

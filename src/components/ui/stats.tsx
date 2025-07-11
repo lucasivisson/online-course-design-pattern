@@ -32,13 +32,13 @@ export function Stats({ items, className }: StatsProps) {
         <div key={index} className="flex flex-col items-center">
           <span
             className={cn(
-              "text-2xl font-bold",
+              "text-3xl font-bold",
               colorClasses[item.color || "blue"]
             )}
           >
             {item.value}
           </span>
-          <span className="text-sm text-gray-500">{item.label}</span>
+          <span className="text-md text-gray-500">{item.label}</span>
         </div>
       ))}
     </div>

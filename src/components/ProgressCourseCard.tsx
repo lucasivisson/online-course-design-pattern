@@ -1,17 +1,18 @@
 import { CourseEntity } from "@/entities/course-entity";
 import { cn } from "@/shared/utils";
-import { Button } from "@/components/ui/button";
-import BookIcon from "@/assets/book.svg";
-import StarIcon from "@/assets/star.svg";
-import UsersIcon from "@/assets/users.svg";
+import Image from "next/image";
 
-interface CourseCardProps {
+interface ProgressCourseCardProps {
   course: CourseEntity;
   onClick?: () => void;
   index: number;
 }
 
-export function CourseCard({ index, course, onClick }: CourseCardProps) {
+export function ProgressCourseCard({
+  index,
+  course,
+  onClick,
+}: ProgressCourseCardProps) {
   const getRandomBackgroundColorBasedOnIndex = (index: number) => {
     const colors = [
       "bg-yellow-500/20",
@@ -36,10 +37,17 @@ export function CourseCard({ index, course, onClick }: CourseCardProps) {
           "w-full relative flex items-center justify-center h-40"
         )}
       >
-        <div className="absolute text-sm top-3 left-3 text-black/70 px-2 py-0.5 bg-white rounded-lg">
-          Programação
+        <div className="absolute flex text-sm gap-0.5 font-semibold top-3 right-3 text-black/70 px-2 py-0.5 bg-white rounded-lg">
+          <Image src="/clock.svg" alt="Clock icon" width={16} height={16} />
+          <span>{80}%</span>
         </div>
-        <BookIcon className="w-12 h-12" />
+        <Image
+          aria-hidden
+          src="/book.svg"
+          alt="Book icon"
+          width={48}
+          height={48}
+        />
       </div>
       <div className="p-6">
         <div className="flex items-center justify-between mb-2">
@@ -57,28 +65,30 @@ export function CourseCard({ index, course, onClick }: CourseCardProps) {
         </p>
 
         <div className="flex items-center gap-4 text-sm text-gray-800">
-          <div className="flex gap-1">
-            <StarIcon className="w-3 h-3" />
-            <span>4.8</span>
-          </div>
-          <div className="flex gap-1">
-            <UsersIcon className="w-3 h-3" />
-            <span>
-              {course.enrollments?.length || 0}{" "}
-              {`${course.enrollments?.length === 1 ? "aluno" : "alunos"}`}
-            </span>
+          <div className="flex flex-col w-full">
+            <div className="flex items-center w-full  justify-between mb-1">
+              <span className="font-semibold">Progresso</span>
+              <span className="font-semibold">{80}%</span>
+            </div>
+            <div className="w-full h-2 bg-gray-100 rounded-full">
+              <div
+                className="h-2 bg-black rounded-full transition-all"
+                style={{ width: `${80}%` }}
+              />
+            </div>
           </div>
         </div>
 
-        <div className="mt-4 pt-4 border-t border-gray-100">
-          <div className="flex items-center justify-between text-xs text-gray-400">
-            <span>
-              <span className="text-3xl font-bold text-green-600">
-                R$ {course.price.toFixed(2)}
-              </span>
+        <div className="mt-4 pt-4">
+          {true ? (
+            <span className="px-2 py-0.5 text-sm bg-blue-100 text-blue-950 rounded-lg">
+              Em andamento
             </span>
-            <Button variant="blue">Inscrever-se</Button>
-          </div>
+          ) : (
+            <span className="px-2 py-0.5 text-sm bg-gray-100 text-gray-950 rounded-lg">
+              Não iniciado
+            </span>
+          )}
         </div>
       </div>
     </div>
