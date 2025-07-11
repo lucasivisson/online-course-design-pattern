@@ -28,8 +28,10 @@ async function request<TResponse = unknown, TRequest = unknown>(
 ): Promise<TResponse> {
   const { headers = {}, params, cache, next } = options;
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+
   const query = buildQuery(params);
-  const fullUrl = `${url}${query}`;
+  const fullUrl = `${API_URL}${url}${query}`;
 
   const res = await fetch(fullUrl, {
     method,

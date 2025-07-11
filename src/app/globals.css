@@ -10,6 +10,14 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --color-custom-yellow: 234 179 8;
+  --color-custom-green: 34 197 94;
+  --color-custom-pink: 236 72 153;
+  --color-custom-blue: 59 130 246;
+  --color-custom-indigo: 99 102 241;
+  --color-custom-red: 239 68 68;
+  --color-custom-orange: 249 115 22;
 }
 
 @media (prefers-color-scheme: dark) {
