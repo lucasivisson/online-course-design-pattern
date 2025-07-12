@@ -2,7 +2,9 @@ import { FileEntity } from "@/entities/file-entity";
 import { Mediator } from "./mediator-interface";
 import { BaseComponent } from "./mediator-interface";
 
-type FileInput = FileEntity 
+type FileInput = Omit<FileEntity, "url"> & {
+  fileBuffer: Uint8Array
+}
 
 /**
  * Componente responsável por iniciar a criação de um Post.
@@ -13,7 +15,7 @@ class PostCreatorComponent extends BaseComponent {
       super(mediator);
     }
 
-    public async createPost(authorId: string, courseId: string, message?: string, file?: FileInput): Promise<void> {
+    public async createPost({authorId, courseId, message, file}: { authorId: string, courseId: string, message?: string, file?: FileInput }): Promise<void> {
       if (!this.mediator) {
         throw new Error('Mediator not set for PostCreatorComponent.');
       }
@@ -31,7 +33,7 @@ class AddThreadComponent extends BaseComponent {
       super(mediator);
     }
 
-    public async addThread(postId: string, authorId: string, courseId: string, message?: string, file?: FileInput): Promise<void> {
+    public async addThread({ postId, authorId, courseId, message, file }: {postId: string, authorId: string, courseId: string, message?: string, file?: FileInput}): Promise<void> {
       if (!this.mediator) {
         throw new Error('Mediator not set for ThreadAdderComponent.');
       }

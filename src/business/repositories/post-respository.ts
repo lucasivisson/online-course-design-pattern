@@ -7,10 +7,10 @@ export type InputCreateUpdatePost = {
   authorId: string,
   file: FileEntity | null
   thread: { authorId: string, message: string | null, file: {
-      fileBuffer: Uint8Array;
-      fileName: string;
-      type: string;
-    } | null }[]
+    fileName: string;
+    type: string;
+    url: string;
+  } | null }[]
 }
 
 export type InputUpdatePost = {

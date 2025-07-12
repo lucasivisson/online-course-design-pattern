@@ -1,8 +1,7 @@
-import { FileEntity } from "@/entities/file-entity";
 import { PostEntity } from "@/entities/post-entity";
 import { IsDefined, IsNotEmpty, IsObject, IsOptional, IsString } from "class-validator";
 
-class File implements FileEntity {
+class File {
   @IsNotEmpty()
   @IsString()
   fileName: string
@@ -29,8 +28,8 @@ export class InputCreatePostDto {
   @IsNotEmpty()
   authorId: string;
 
-  @IsOptional()
-  @IsObject()
+  // @IsOptional()
+  // @IsObject()
   file: File
 }
 
@@ -57,8 +56,6 @@ class Thread {
   @IsNotEmpty()
   message: string;
 
-  @IsOptional()
-  @IsObject()
   file: File
 }
 
@@ -84,7 +81,7 @@ export class InputListPostsDto {
   @IsNotEmpty()
   userId: string
 
-  @IsObject()
+  @IsString()
   @IsNotEmpty()
   courseId: string
 }

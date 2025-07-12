@@ -1,4 +1,4 @@
-import { InputListNotificationsDto } from "@/business/dto/notification/notification-dto";
+import { InputListNotificationsDto, InputReadNotificationDto } from "@/business/dto/notification/notification-dto";
 import { NotificationUseCase } from "@/business/use-cases/notification/notification-use-case";
 import { PrismaNotificationRepository } from "@/framework/repositories/prisma-notification-repository";
 import { errorHandler } from "@/shared/http-handler";
@@ -31,6 +31,29 @@ export class NotificationController {
       });
     } catch (error) {
       console.error("Erro ao listar notificacoes:", error);
+      throw new Error(
+        error instanceof Error ? error.message : "An unknown error occurred."
+      );
+    }
+  }
+
+  async read(userId: string, notificationId: string) {
+    try {
+      const dto = plainToInstance(InputReadNotificationDto, { userId, notificationId });
+      const errors = await validate(dto);
+
+      if (errors.length > 0) return errorHandler(errors);
+
+      const notifications = await this.notificationUseCase.read(dto);
+
+      return new Response(JSON.stringify(notifications), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    } catch(error) {
+      console.error("Erro ao marcar notificacao como lida", error);
       throw new Error(
         error instanceof Error ? error.message : "An unknown error occurred."
       );

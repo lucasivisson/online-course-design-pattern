@@ -8,3 +8,16 @@ export class InputListNotificationsDto {
 }
 
 export type OutputListNotificationsDto = NotificationEntity[]
+
+export class InputReadNotificationDto {
+  @IsString()
+  @IsNotEmpty()
+  userId: string
+
+  @IsString()
+  @IsNotEmpty()
+  notificationId: string
+}
+
+export type OutputReadNotificationDto = void
+
