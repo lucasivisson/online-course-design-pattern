@@ -48,7 +48,6 @@ export class InputUpdateCourseDto {
   description: string;
 
   @IsString()
-  @IsOptional()
   @IsNotEmpty()
   professorId?: string;
 

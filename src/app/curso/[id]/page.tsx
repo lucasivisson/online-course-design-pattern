@@ -1,44 +1,84 @@
 "use client";
 
+import { ModuleEntity } from "@/entities/module-entity";
 import { useState } from "react";
 
 export default function CourseManagement() {
-  const [modules] = useState([
+  const [modules] = useState<ModuleEntity[]>([
     {
-      id: 1,
-      title: "Módulo 1: Introdução aos Padrões",
-      lessons: [
+      id: "123",
+      name: "Módulo 1: Introdução aos Padrões",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      classes: [
         {
-          id: 1,
-          title: "O que são Padrões de Software",
-          duration: "15 min",
-          completed: true,
+          id: "12345",
+          name: "O que são Padrões de Software",
+          type: "video",
+          videoUrl: "https://example.com/video1.mp4",
+          quizId: null,
+          textContent: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
-          id: 2,
-          title: "História e Evolução",
-          duration: "10 min",
-          completed: true,
+          id: "12346",
+          name: "História e Evolução",
+          type: "text",
+          quizId: null,
+          videoUrl: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          textContent: "Conteúdo sobre a história dos padrões de software.",
         },
         {
-          id: 3,
-          title: "Quiz: Conceitos Básicos",
-          duration: "",
-          completed: true,
+          id: "12347",
+          name: "Quiz: Conceitos Básicos",
+          type: "quiz",
+          quizId: "quiz123",
+          videoUrl: null,
+          textContent: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       ],
     },
     {
-      id: 2,
-      title: "Módulo 2: Padrões Criacionais",
-      lessons: [
+      id: "124",
+      name: "Módulo 2: Padrões Criacionais",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      classes: [
         {
-          id: 4,
-          title: "Singleton Pattern",
-          duration: "20 min",
-          completed: true,
+          id: "12348",
+          name: "Singleton Pattern",
+          type: "video",
+          videoUrl: "https://example.com/video2.mp4",
+          quizId: null,
+          textContent: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
-        { id: 5, title: "Factory Pattern", duration: "", completed: false },
+        {
+          id: "12349",
+          name: "Builder Pattern",
+          type: "text",
+          videoUrl: null,
+          quizId: null,
+          textContent: "Conteúdo sobre o padrão Builder.",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: "12350",
+          name: "Factory Pattern",
+          type: "quiz",
+          videoUrl: null,
+          quizId: "quiz124",
+          textContent: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ],
     },
   ]);
@@ -52,8 +92,11 @@ export default function CourseManagement() {
           </h1>
           <div className="flex gap-6 mt-4 text-gray-600">
             <span>45 alunos inscritos</span>
-            <span>3 módulos</span>
-            <span>9 aulas</span>
+            <span>{modules.length} módulos</span>
+            <span>
+              {modules.reduce((acc, module) => acc + module.classes.length, 0)}{" "}
+              aulas
+            </span>
           </div>
         </div>
         <div>
@@ -139,7 +182,7 @@ export default function CourseManagement() {
 
           <span className="font-medium">Publicar trabalho</span>
         </button>
-        <button className="flex cursor-pointer justify-center items-center gap-2 w-[25%] py-4 px-2 text-white bg-[#9333EA] hover:bg-[#9233eabb] rounded-md transition-colors duration-200">
+        {/* <button className="flex cursor-pointer justify-center items-center gap-2 w-[25%] py-4 px-2 text-white bg-[#9333EA] hover:bg-[#9233eabb] rounded-md transition-colors duration-200">
           <svg
             width="17"
             height="16"
@@ -157,7 +200,7 @@ export default function CourseManagement() {
           </svg>
 
           <span className="font-medium">Criar quiz</span>
-        </button>
+        </button> */}
       </div>
       <hr />
       <div className="mt-4">
@@ -198,9 +241,14 @@ export default function CourseManagement() {
             className="bg-white rounded-lg shadow border mb-6 overflow-hidden"
           >
             <div className="flex justify-between p-6 border-b">
-              <h3 className="font-bold text-lg text-gray-900">
-                {module.title}
-              </h3>
+              <div>
+                <h3 className="font-bold text-lg text-gray-900">
+                  {module.name}
+                </h3>
+                <span className="text-gray-600">
+                  {module.classes.length} aulas
+                </span>
+              </div>
               <button className="flex items-center justify-between font-medium cursor-pointer py-2 px-2 w-[140px] bg-[#16A34A] hover:bg-[#16a34ac4] text-white rounded-md">
                 <svg
                   width="17"
@@ -225,53 +273,219 @@ export default function CourseManagement() {
                   />
                 </svg>
                 <span className="text-[14px]">Adicionar Aula</span>
-                <div></div>
+                <div />
               </button>
             </div>
 
             <div className="divide-y">
-              {module.lessons.map((lesson) => (
+              {module.classes.map((lesson) => (
                 <div key={lesson.id} className="p-4 hover:bg-gray-50">
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
                       <div className="flex items-center gap-2">
+                        {lesson.type === "video" && (
+                          <>
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 16 16"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M4 2L13.3333 8L4 14V2Z"
+                                stroke="#2563EB"
+                                stroke-width="1.33333"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                            </svg>
+
+                            <div className="bg-[#F3F4F6] px-[5px] rounded-md">
+                              <span className="text-[#6B7280] text-[12px] font-medium">
+                                Vídeo
+                              </span>
+                            </div>
+                          </>
+                        )}
+                        {lesson.type === "text" && (
+                          <>
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 16 16"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M9.99996 1.33325H3.99996C3.64634 1.33325 3.3072 1.47373 3.05715 1.72378C2.8071 1.97382 2.66663 2.31296 2.66663 2.66659V13.3333C2.66663 13.6869 2.8071 14.026 3.05715 14.2761C3.3072 14.5261 3.64634 14.6666 3.99996 14.6666H12C12.3536 14.6666 12.6927 14.5261 12.9428 14.2761C13.1928 14.026 13.3333 13.6869 13.3333 13.3333V4.66659L9.99996 1.33325Z"
+                                stroke="#16A34A"
+                                stroke-width="1.33333"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                              <path
+                                d="M9.33337 1.33325V3.99992C9.33337 4.35354 9.47385 4.69268 9.7239 4.94273C9.97395 5.19278 10.3131 5.33325 10.6667 5.33325H13.3334"
+                                stroke="#16A34A"
+                                stroke-width="1.33333"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                              <path
+                                d="M6.66671 6H5.33337"
+                                stroke="#16A34A"
+                                stroke-width="1.33333"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                              <path
+                                d="M10.6667 8.66675H5.33337"
+                                stroke="#16A34A"
+                                stroke-width="1.33333"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                              <path
+                                d="M10.6667 11.3333H5.33337"
+                                stroke="#16A34A"
+                                stroke-width="1.33333"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                            </svg>
+
+                            <div className="bg-[#F3F4F6] px-[5px] rounded-md">
+                              <span className="text-[#6B7280] text-[12px] font-medium">
+                                Texto
+                              </span>
+                            </div>
+                          </>
+                        )}
+                        {lesson.type === "quiz" && (
+                          <>
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 16 16"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <g clip-path="url(#clip0_102_1759)">
+                                <path
+                                  d="M8.00004 14.6666C11.6819 14.6666 14.6667 11.6818 14.6667 7.99992C14.6667 4.31802 11.6819 1.33325 8.00004 1.33325C4.31814 1.33325 1.33337 4.31802 1.33337 7.99992C1.33337 11.6818 4.31814 14.6666 8.00004 14.6666Z"
+                                  stroke="#9333EA"
+                                  stroke-width="1.33333"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                                <path
+                                  d="M6.06006 5.99989C6.21679 5.55434 6.52616 5.17863 6.93336 4.93931C7.34056 4.7 7.81932 4.61252 8.28484 4.69237C8.75036 4.77222 9.1726 5.01424 9.47678 5.37558C9.78095 5.73691 9.94743 6.19424 9.94673 6.66656C9.94673 7.99989 7.94673 8.66656 7.94673 8.66656"
+                                  stroke="#9333EA"
+                                  stroke-width="1.33333"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                                <path
+                                  d="M8 11.3333H8.00667"
+                                  stroke="#9333EA"
+                                  stroke-width="1.33333"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                              </g>
+                              <defs>
+                                <clipPath id="clip0_102_1759">
+                                  <rect width="16" height="16" fill="white" />
+                                </clipPath>
+                              </defs>
+                            </svg>
+
+                            <div className="bg-[#F3F4F6] px-[5px] rounded-md">
+                              <span className="text-[#6B7280] text-[12px] font-medium">
+                                Quiz
+                              </span>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                      <div className="flex flex-col ml-3">
+                        <p className="font-normal text-gray-900">
+                          {lesson.name}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-5">
+                      <span className="cursor-pointer text-gray-500 hover:text-gray-700">
                         <svg
-                          width="16"
-                          height="16"
+                          width="21"
+                          height="21"
                           viewBox="0 0 16 16"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            d="M4 2L13.3333 8L4 14V2Z"
-                            stroke="#2563EB"
+                            d="M8 2H3.33333C2.97971 2 2.64057 2.14048 2.39052 2.39052C2.14048 2.64057 2 2.97971 2 3.33333V12.6667C2 13.0203 2.14048 13.3594 2.39052 13.6095C2.64057 13.8595 2.97971 14 3.33333 14H12.6667C13.0203 14 13.3594 13.8595 13.6095 13.6095C13.8595 13.3594 14 13.0203 14 12.6667V8"
+                            stroke="currentColor"
+                            stroke-width="1.33333"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M12.2499 1.74991C12.5151 1.48469 12.8748 1.33569 13.2499 1.33569C13.625 1.33569 13.9847 1.48469 14.2499 1.74991C14.5151 2.01512 14.6641 2.37483 14.6641 2.74991C14.6641 3.12498 14.5151 3.48469 14.2499 3.74991L7.99992 9.99991L5.33325 10.6666L5.99992 7.99991L12.2499 1.74991Z"
+                            stroke="currentColor"
                             stroke-width="1.33333"
                             stroke-linecap="round"
                             stroke-linejoin="round"
                           />
                         </svg>
-
-                        <div className="bg-[#F3F4F6] px-[5px] rounded-md">
-                          <span className="text-[#6B7280] text-[12px] font-medium">
-                            Vídeo
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex flex-col ml-3">
-                        <p className="font-normal text-gray-900">
-                          {lesson.id}. {lesson.title}
-                        </p>
-                        {lesson.duration && (
-                          <p className="text-sm text-gray-500">
-                            {lesson.duration}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center">
+                      </span>
+                      <span className="cursor-pointer text-gray-500 hover:text-gray-700">
+                        <svg
+                          width="21"
+                          height="21"
+                          viewBox="0 0 16 16"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M2 4H14"
+                            stroke="currentColor"
+                            stroke-width="1.33333"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M12.6666 4V13.3333C12.6666 14 11.9999 14.6667 11.3333 14.6667H4.66659C3.99992 14.6667 3.33325 14 3.33325 13.3333V4"
+                            stroke="currentColor"
+                            stroke-width="1.33333"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M5.33325 3.99992V2.66659C5.33325 1.99992 5.99992 1.33325 6.66659 1.33325H9.33325C9.99992 1.33325 10.6666 1.99992 10.6666 2.66659V3.99992"
+                            stroke="currentColor"
+                            stroke-width="1.33333"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M6.66675 7.33325V11.3333"
+                            stroke="currentColor"
+                            stroke-width="1.33333"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M9.33325 7.33325V11.3333"
+                            stroke="currentColor"
+                            stroke-width="1.33333"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </span>
                       <input
                         type="checkbox"
-                        checked={lesson.completed}
                         onChange={() => {}}
                         className="h-5 w-5 text-blue-600 rounded"
                       />
