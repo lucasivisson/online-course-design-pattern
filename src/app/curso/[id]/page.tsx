@@ -240,7 +240,7 @@ export default function CourseManagement() {
             key={module.id}
             className="bg-white rounded-lg shadow border mb-6 overflow-hidden"
           >
-            <div className="flex justify-between p-6 border-b">
+            <div className="flex justify-between p-6 border-b bg-[#F9FAFB]">
               <div>
                 <h3 className="font-bold text-lg text-gray-900">
                   {module.name}
