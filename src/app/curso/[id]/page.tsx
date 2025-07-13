@@ -1,9 +1,11 @@
 "use client";
 
 import { ModuleEntity } from "@/entities/module-entity";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function CourseManagement() {
+  const router = useRouter();
   const [modules] = useState<ModuleEntity[]>([
     {
       id: "123",
@@ -83,6 +85,14 @@ export default function CourseManagement() {
     },
   ]);
 
+  const onHandleCreateLesson = () => {
+    router.push("/criar-aula");
+  };
+
+  const onHandleCreateModule = () => {
+    router.push("/criar-modulo");
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <header className="flex justify-between">
@@ -146,37 +156,37 @@ export default function CourseManagement() {
             <path
               d="M10.75 1.33325H4.74996C4.39634 1.33325 4.0572 1.47373 3.80715 1.72378C3.5571 1.97382 3.41663 2.31296 3.41663 2.66659V13.3333C3.41663 13.6869 3.5571 14.026 3.80715 14.2761C4.0572 14.5261 4.39634 14.6666 4.74996 14.6666H12.75C13.1036 14.6666 13.4427 14.5261 13.6928 14.2761C13.9428 14.026 14.0833 13.6869 14.0833 13.3333V4.66659L10.75 1.33325Z"
               stroke="white"
-              stroke-width="1.33333"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="1.33333"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
             <path
               d="M10.0834 1.33325V3.99992C10.0834 4.35354 10.2239 4.69268 10.4739 4.94273C10.7239 5.19278 11.0631 5.33325 11.4167 5.33325H14.0834"
               stroke="white"
-              stroke-width="1.33333"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="1.33333"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
             <path
               d="M7.41671 6H6.08337"
               stroke="white"
-              stroke-width="1.33333"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="1.33333"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
             <path
               d="M11.4167 8.66675H6.08337"
               stroke="white"
-              stroke-width="1.33333"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="1.33333"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
             <path
               d="M11.4167 11.3333H6.08337"
               stroke="white"
-              stroke-width="1.33333"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="1.33333"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
           </svg>
 
@@ -219,19 +229,19 @@ export default function CourseManagement() {
               <path
                 d="M3.84888 8H13.1822"
                 stroke="#FAFAFA"
-                stroke-width="1.33333"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="1.33333"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               />
               <path
                 d="M8.51562 3.33325V12.6666"
                 stroke="#FAFAFA"
-                stroke-width="1.33333"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="1.33333"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               />
             </svg>
-            <span>Adicionar Módulo</span>
+            <span onClick={onHandleCreateModule}>Adicionar Módulo</span>
             <div />
           </button>
         </div>
@@ -260,19 +270,21 @@ export default function CourseManagement() {
                   <path
                     d="M3.84888 8H13.1822"
                     stroke="#FAFAFA"
-                    stroke-width="1.33333"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeWidth="1.33333"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />
                   <path
                     d="M8.51562 3.33325V12.6666"
                     stroke="#FAFAFA"
-                    stroke-width="1.33333"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeWidth="1.33333"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />
                 </svg>
-                <span className="text-[14px]">Adicionar Aula</span>
+                <span onClick={onHandleCreateLesson} className="text-[14px]">
+                  Adicionar Aula
+                </span>
                 <div />
               </button>
             </div>
@@ -295,9 +307,9 @@ export default function CourseManagement() {
                               <path
                                 d="M4 2L13.3333 8L4 14V2Z"
                                 stroke="#2563EB"
-                                stroke-width="1.33333"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
+                                strokeWidth="1.33333"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                               />
                             </svg>
 
@@ -320,37 +332,37 @@ export default function CourseManagement() {
                               <path
                                 d="M9.99996 1.33325H3.99996C3.64634 1.33325 3.3072 1.47373 3.05715 1.72378C2.8071 1.97382 2.66663 2.31296 2.66663 2.66659V13.3333C2.66663 13.6869 2.8071 14.026 3.05715 14.2761C3.3072 14.5261 3.64634 14.6666 3.99996 14.6666H12C12.3536 14.6666 12.6927 14.5261 12.9428 14.2761C13.1928 14.026 13.3333 13.6869 13.3333 13.3333V4.66659L9.99996 1.33325Z"
                                 stroke="#16A34A"
-                                stroke-width="1.33333"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
+                                strokeWidth="1.33333"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                               />
                               <path
                                 d="M9.33337 1.33325V3.99992C9.33337 4.35354 9.47385 4.69268 9.7239 4.94273C9.97395 5.19278 10.3131 5.33325 10.6667 5.33325H13.3334"
                                 stroke="#16A34A"
-                                stroke-width="1.33333"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
+                                strokeWidth="1.33333"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                               />
                               <path
                                 d="M6.66671 6H5.33337"
                                 stroke="#16A34A"
-                                stroke-width="1.33333"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
+                                strokeWidth="1.33333"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                               />
                               <path
                                 d="M10.6667 8.66675H5.33337"
                                 stroke="#16A34A"
-                                stroke-width="1.33333"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
+                                strokeWidth="1.33333"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                               />
                               <path
                                 d="M10.6667 11.3333H5.33337"
                                 stroke="#16A34A"
-                                stroke-width="1.33333"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
+                                strokeWidth="1.33333"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                               />
                             </svg>
 
@@ -370,27 +382,27 @@ export default function CourseManagement() {
                               fill="none"
                               xmlns="http://www.w3.org/2000/svg"
                             >
-                              <g clip-path="url(#clip0_102_1759)">
+                              <g clipPath="url(#clip0_102_1759)">
                                 <path
                                   d="M8.00004 14.6666C11.6819 14.6666 14.6667 11.6818 14.6667 7.99992C14.6667 4.31802 11.6819 1.33325 8.00004 1.33325C4.31814 1.33325 1.33337 4.31802 1.33337 7.99992C1.33337 11.6818 4.31814 14.6666 8.00004 14.6666Z"
                                   stroke="#9333EA"
-                                  stroke-width="1.33333"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
+                                  strokeWidth="1.33333"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
                                 />
                                 <path
                                   d="M6.06006 5.99989C6.21679 5.55434 6.52616 5.17863 6.93336 4.93931C7.34056 4.7 7.81932 4.61252 8.28484 4.69237C8.75036 4.77222 9.1726 5.01424 9.47678 5.37558C9.78095 5.73691 9.94743 6.19424 9.94673 6.66656C9.94673 7.99989 7.94673 8.66656 7.94673 8.66656"
                                   stroke="#9333EA"
-                                  stroke-width="1.33333"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
+                                  strokeWidth="1.33333"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
                                 />
                                 <path
                                   d="M8 11.3333H8.00667"
                                   stroke="#9333EA"
-                                  stroke-width="1.33333"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
+                                  strokeWidth="1.33333"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
                                 />
                               </g>
                               <defs>
@@ -426,16 +438,16 @@ export default function CourseManagement() {
                           <path
                             d="M8 2H3.33333C2.97971 2 2.64057 2.14048 2.39052 2.39052C2.14048 2.64057 2 2.97971 2 3.33333V12.6667C2 13.0203 2.14048 13.3594 2.39052 13.6095C2.64057 13.8595 2.97971 14 3.33333 14H12.6667C13.0203 14 13.3594 13.8595 13.6095 13.6095C13.8595 13.3594 14 13.0203 14 12.6667V8"
                             stroke="currentColor"
-                            stroke-width="1.33333"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeWidth="1.33333"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           />
                           <path
                             d="M12.2499 1.74991C12.5151 1.48469 12.8748 1.33569 13.2499 1.33569C13.625 1.33569 13.9847 1.48469 14.2499 1.74991C14.5151 2.01512 14.6641 2.37483 14.6641 2.74991C14.6641 3.12498 14.5151 3.48469 14.2499 3.74991L7.99992 9.99991L5.33325 10.6666L5.99992 7.99991L12.2499 1.74991Z"
                             stroke="currentColor"
-                            stroke-width="1.33333"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeWidth="1.33333"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           />
                         </svg>
                       </span>
@@ -450,37 +462,37 @@ export default function CourseManagement() {
                           <path
                             d="M2 4H14"
                             stroke="currentColor"
-                            stroke-width="1.33333"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeWidth="1.33333"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           />
                           <path
                             d="M12.6666 4V13.3333C12.6666 14 11.9999 14.6667 11.3333 14.6667H4.66659C3.99992 14.6667 3.33325 14 3.33325 13.3333V4"
                             stroke="currentColor"
-                            stroke-width="1.33333"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeWidth="1.33333"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           />
                           <path
                             d="M5.33325 3.99992V2.66659C5.33325 1.99992 5.99992 1.33325 6.66659 1.33325H9.33325C9.99992 1.33325 10.6666 1.99992 10.6666 2.66659V3.99992"
                             stroke="currentColor"
-                            stroke-width="1.33333"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeWidth="1.33333"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           />
                           <path
                             d="M6.66675 7.33325V11.3333"
                             stroke="currentColor"
-                            stroke-width="1.33333"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeWidth="1.33333"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           />
                           <path
                             d="M9.33325 7.33325V11.3333"
                             stroke="currentColor"
-                            stroke-width="1.33333"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeWidth="1.33333"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           />
                         </svg>
                       </span>

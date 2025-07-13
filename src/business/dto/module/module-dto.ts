@@ -48,6 +48,7 @@ export class InputCreateModuleDto {
 
   @IsArray()
   @ValidateNested({ each: true })
+  @IsOptional()
   @Type(() => ClassDto)
   classes: ClassDto[];
 }
@@ -63,6 +64,7 @@ export class InputUpdateModuleDto {
   coursesIds: string[];
 
   @IsString()
+  @IsOptional()
   @IsNotEmpty()
   name: string;
 
