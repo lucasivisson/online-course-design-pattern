@@ -27,11 +27,6 @@ export class InputCreateCourseDto {
   @IsInt()
   @Min(0)
   price: number;
-
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => InputCreateModuleDto)
-  modules: InputCreateModuleDto[];
 }
 
 export class InputUpdateCourseDto {
@@ -40,14 +35,17 @@ export class InputUpdateCourseDto {
   courseId: string;
 
   @IsString()
+  @IsOptional()
   @IsNotEmpty()
-  name: string;
+  name?: string;
 
   @IsString()
+  @IsOptional()
   @IsNotEmpty()
   description: string;
 
   @IsString()
+  @IsOptional()
   @IsNotEmpty()
   professorId?: string;
 

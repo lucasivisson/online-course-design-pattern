@@ -25,22 +25,14 @@ export class CourseUseCase {
   }
 
   async create(data: InputCreateCourseDto): Promise<OutputCreateCourseDto> {
-    const user = await this.userRepository.getBy({ id: data.professorId });
+    if (data.professorId) {
+      const user = await this.userRepository.getBy({ id: data.professorId });
 
-    if (!user || user.role !== "professor")
-      throw new Error("Invalid teacher id. Please provide a valid id.");
+      if (!user || user.role !== "professor")
+        throw new Error("Invalid teacher id. Please provide a valid id.");
+    }
 
     const course = await this.courseRepository.create(data);
-
-    if (data.modules) {
-      for (let index = 0; index < data.modules.length; index++) {
-        const element = data.modules[index];
-        await this.moduleUseCase.create({
-          ...element,
-          coursesIds: [course.id],
-        });
-      }
-    }
 
     return (await this.courseRepository.get({ courseId: course.id }))!;
   }
@@ -50,12 +42,13 @@ export class CourseUseCase {
   }
 
   async update(data: InputUpdateCourseDto): Promise<OutputUpdateCourseDto> {
+    if (data.professorId) {
+      const user = await this.userRepository.getBy({ id: data.professorId });
+
+      if (!user || user.role !== "professor")
+        throw new Error("Invalid teacher id. Please provide a valid id.");
+    }
     const course = await this.courseRepository.update(data);
-
-    const user = await this.userRepository.getBy({ id: course.professorId });
-
-    if (!user)
-      throw new Error("Invalid teacher id. Please provide a valid id.");
 
     if (data.modules) {
       for (let index = 0; index < data.modules.length; index++) {
