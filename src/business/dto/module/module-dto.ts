@@ -17,6 +17,11 @@ export enum ClassType {
 
 export class ClassDto {
   @IsString()
+  @IsOptional()
+  @IsNotEmpty()
+  id: string;
+
+  @IsString()
   @IsNotEmpty()
   name: string;
 
@@ -72,6 +77,10 @@ export class InputUpdateModuleDto {
   @IsOptional()
   @Type(() => ClassDto)
   classes?: ClassDto[];
+
+  @IsArray()
+  @IsOptional()
+  deletedClasses?: string[];
 }
 
 export class InputGetModuleDto {

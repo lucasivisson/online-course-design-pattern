@@ -38,25 +38,55 @@ export class PrismaModuleRepository implements IModuleRepository {
 
   async update(input: InputUpdateModuleDto): Promise<ModuleEntity> {
     const moduleData = await this.get({ moduleId: input.moduleId });
+    let latestClasses = moduleData?.classes || [];
 
-    const latestsClasses = moduleData?.classes || [];
+    // 1. Remove classes marcadas para exclusão
+    if (input.deletedClasses && input.deletedClasses.length > 0) {
+      latestClasses = latestClasses.filter(
+        (c) => !input.deletedClasses?.includes(c.id)
+      );
+    }
+
+    // 2. Processa atualizações/criações
+    const updatedClasses = input.classes
+      ? input.classes.map((newClass) => {
+          // Atualiza classe existente
+          if (newClass.id) {
+            const existingClass = latestClasses.find(
+              (c) => c.id === newClass.id
+            );
+            if (existingClass) {
+              return {
+                ...existingClass,
+                ...newClass,
+                updatedAt: new Date(),
+              };
+            }
+          }
+
+          // Cria nova classe
+          return {
+            ...newClass,
+            id: uuidv4(),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+        })
+      : undefined;
+
+    // 3. Persiste no banco
     const data = await prisma.module.update({
       where: { id: input.moduleId },
       data: {
         name: input.name,
-        classes: input.classes
+        classes: updatedClasses
           ? [
-              ...latestsClasses,
-              ...input.classes.map((value) => {
-                return {
-                  ...value,
-                  id: uuidv4(),
-                  createdAt: new Date(),
-                  updatedAt: new Date(),
-                };
-              }),
+              ...latestClasses.filter(
+                (c) => !input.classes?.some((nc) => nc.id === c.id)
+              ),
+              ...updatedClasses,
             ]
-          : undefined,
+          : latestClasses,
       },
     });
 

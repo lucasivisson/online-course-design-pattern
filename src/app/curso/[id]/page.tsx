@@ -5,6 +5,28 @@ import { CourseEntity } from "@/entities/course-entity";
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import Modal from "react-modal";
+
+const customStyles = {
+  content: {
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    marginRight: "-50%",
+    transform: "translate(-50%, -50%)",
+    maxWidth: "500px",
+    width: "90%",
+    borderRadius: "8px",
+    border: "none",
+    boxShadow:
+      "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+  },
+  overlay: {
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    zIndex: 1000,
+  },
+};
 
 export default function CourseManagement() {
   const router = useRouter();
@@ -13,6 +35,12 @@ export default function CourseManagement() {
 
   const [course, setCourse] = useState<CourseEntity | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [classToDelete, setClassToDelete] = useState<{
+    moduleId: string;
+    classId: string;
+  } | null>(null);
 
   useEffect(() => {
     const fetchCourseData = async () => {
@@ -40,6 +68,47 @@ export default function CourseManagement() {
     router.push(`/criar-aula/${moduleId}`);
   };
 
+  const onHandleUpdateLesson = (moduleId: string, classId: string) => {
+    router.push(`/atualizar-aula/${moduleId}?aulaId=${classId}`);
+  };
+
+  const openDeleteModal = (moduleId: string, classId: string) => {
+    setClassToDelete({ moduleId, classId });
+    setModalIsOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setModalIsOpen(false);
+    setClassToDelete(null);
+  };
+
+  const onHandleDeleteLesson = async () => {
+    if (!classToDelete || isDeleting) return;
+
+    try {
+      setIsDeleting(true);
+      const toastId = toast.loading("Excluindo aula...");
+
+      await api.patch(`/api/module/${classToDelete.moduleId}`, {
+        deletedClasses: [classToDelete.classId],
+      });
+
+      toast.success("Aula excluída com sucesso!", { id: toastId });
+
+      closeDeleteModal();
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (err) {
+      const error = err as Error;
+      console.error("Erro ao excluir aula:", error);
+      toast.error(error?.message || "Erro ao excluir aula. Tente novamente.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const onHandleCreateModule = () => {
     router.push(`/criar-modulo/${courseId}`);
   };
@@ -48,7 +117,9 @@ export default function CourseManagement() {
     return (
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex justify-center items-center h-64">
-          <p>Carregando curso...</p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Carregando curso...
+          </h1>
         </div>
       </div>
     );
@@ -68,6 +139,41 @@ export default function CourseManagement() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={closeDeleteModal}
+        style={customStyles}
+        contentLabel="Confirmar exclusão"
+      >
+        <div className="p-2">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">
+            Confirmar exclusão
+          </h2>
+          <p className="text-gray-700 mb-6">
+            Tem certeza que deseja excluir esta aula? Esta ação não pode ser
+            desfeita.
+          </p>
+
+          <div className="flex justify-end gap-3">
+            <button
+              onClick={closeDeleteModal}
+              className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
+              disabled={isDeleting}
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={onHandleDeleteLesson}
+              className={`px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-md ${
+                isDeleting ? "opacity-70 cursor-not-allowed" : ""
+              }`}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Excluindo..." : "Excluir"}
+            </button>
+          </div>
+        </div>
+      </Modal>
       <header className="flex justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
@@ -361,7 +467,12 @@ export default function CourseManagement() {
                       </div>
                     </div>
                     <div className="flex items-center gap-5">
-                      <span className="cursor-pointer text-gray-500 hover:text-gray-700">
+                      <span
+                        onClick={() =>
+                          onHandleUpdateLesson(module.id, lesson.id)
+                        }
+                        className="cursor-pointer text-gray-500 hover:text-gray-700"
+                      >
                         <svg
                           width="21"
                           height="21"
@@ -385,7 +496,14 @@ export default function CourseManagement() {
                           />
                         </svg>
                       </span>
-                      <span className="cursor-pointer text-gray-500 hover:text-gray-700">
+                      <span
+                        onClick={openDeleteModal.bind(
+                          null,
+                          module.id,
+                          lesson.id
+                        )}
+                        className="cursor-pointer text-gray-500 hover:text-gray-700"
+                      >
                         <svg
                           width="21"
                           height="21"
