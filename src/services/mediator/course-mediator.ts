@@ -9,6 +9,7 @@ import { PrismaPostRepository } from '@/framework/repositories/prisma-post-repos
 import { BaseComponent, Mediator } from './mediator-interface';
 import { getCourseNotificationObserver } from '../observer/notification-observer';
 import { AddThreadComponent, PostCreatorComponent } from './communication-components';
+import { saveFileToDisk } from '@/shared/storageService';
 
 // Para o Next.js, é importante garantir que o mapa de mediadores seja um singleton global
 declare global {
@@ -18,7 +19,7 @@ declare global {
 class CourseMediator implements Mediator {
   private courseId: string;
   private postCreatorComponent: PostCreatorComponent;
-  private threadAdderComponent: AddThreadComponent;
+  private addThreadComponent: AddThreadComponent;
   public userRepository: IUserRepository
   public postRepository: IPostRepository
   public courseRepository: ICourseRepository
@@ -29,7 +30,7 @@ class CourseMediator implements Mediator {
 
     this.courseId = courseId;
     this.postCreatorComponent = new PostCreatorComponent();
-    this.threadAdderComponent = new AddThreadComponent();
+    this.addThreadComponent = new AddThreadComponent();
     this.userRepository = userRepository
     this.courseRepository = courseRepository
     this.courseRepository = courseRepository
@@ -37,7 +38,7 @@ class CourseMediator implements Mediator {
 
     // O mediador se "seta" como o mediador desses componentes
     this.postCreatorComponent.setMediator(this);
-    this.threadAdderComponent.setMediator(this);
+    this.addThreadComponent.setMediator(this);
   }
 
   // O método principal que o Mediator usa para reagir a eventos dos componentes.
@@ -51,15 +52,20 @@ class CourseMediator implements Mediator {
         throw new Error('Um post deve ter uma mensagem ou um arquivo.');
       }
 
+      let fileObject;
+      if (file) {
+        fileObject = {
+          fileName: file.fileName,
+          type: file.type,
+          url: await saveFileToDisk(Buffer.from(file.fileBuffer), file.fileName)
+        }
+      }
+
       const newPost = await this.postRepository.create({
         courseId: courseId,
         authorId: authorId,
         message: message,
-        file: file ? {
-          fileBuffer: file.fileBuffer,
-          fileName: file.fileName,
-          type: file.type,
-        } : null,
+        file: fileObject ? fileObject : null,
         thread: []
       });
 
@@ -69,12 +75,12 @@ class CourseMediator implements Mediator {
       const course = await this.courseRepository.get({ courseId: courseId });
 
       if (author && course) {
-        const postContentSummary = message ? message.substring(0, 50) + '...' : 'um arquivo anexo.';
-        const notificationMessage = `"${author.name}" postou: "${postContentSummary}" no curso "${course.name}"!`;
-        await notificationObserver.notify(notificationMessage, authorId);
+        const postContentSummary = message ? message : 'um arquivo em anexo.';
+        const notificationMessage = `${author.name} postou "${postContentSummary}" no curso "${course.name}"!`;
+        console.log(`Mediator: Post ${newPost.id} criado e notificação disparada.`);
+        await notificationObserver.notify(notificationMessage, authorId, authorId);
       }
 
-      console.log(`Mediator: Post ${newPost.id} criado e notificação disparada.`);
     }
 
     // Lógica para adicionar uma Thread
@@ -91,14 +97,19 @@ class CourseMediator implements Mediator {
         throw new Error('Post não encontrado.');
       }
 
+      let fileObject;
+      if (file) {
+        fileObject = {
+          fileName: file.fileName,
+          type: file.type,
+          url: await saveFileToDisk(Buffer.from(file.fileBuffer), file.fileName)
+        }
+      }
+
       const newThreadData = {
         authorId: authorId,
         message: message || null,
-        file: file ? {
-          fileBuffer: file.fileBuffer,
-          fileName: file.fileName,
-          type: file.type,
-        } : null,
+        file: fileObject ? fileObject : null,
       };
 
       const newThread = post.thread ? [...post.thread, newThreadData] : [newThreadData]
@@ -113,12 +124,12 @@ class CourseMediator implements Mediator {
       // Notificar o autor do post original e todos os participantes do curso (via Observer)
       const notificationObserver = getCourseNotificationObserver(courseId);
       const author = await this.userRepository.getBy({ id: authorId });
-      const course = await this.userRepository.getBy({ id: courseId });
+      const course = await this.courseRepository.getBy({ id: courseId });
 
       if (author && course) {
-        const threadContentSummary = message ? message.substring(0, 50) + '...' : 'um arquivo anexo.';
-        const notificationMessage = `"${author.name}" respondeu: "${threadContentSummary}" em um post no curso "${course.name}"!`;
-        await notificationObserver.notify(notificationMessage, authorId);
+        const threadContentSummary = message ? message : 'um arquivo anexo.';
+        const notificationMessage = `${author.name} respondeu "${threadContentSummary}" em um post no curso "${course.name}"!`;
+        await notificationObserver.notify(notificationMessage, authorId, authorId);
 
         // Se precisar de notificação específica para o autor do post, pode ser feito aqui
         // Ex: if (authorId !== post.authorId && post.authorId) { /* Lógica de notificação direta */ }
@@ -133,8 +144,8 @@ class CourseMediator implements Mediator {
     return this.postCreatorComponent;
   }
 
-  public getThreadAdderComponent(): AddThreadComponent {
-    return this.threadAdderComponent;
+  public getAddThreadComponent(): AddThreadComponent {
+    return this.addThreadComponent;
   }
 }
 

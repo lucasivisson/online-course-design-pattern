@@ -1,13 +1,18 @@
 import { InputAddThreadToPostDto, InputCreatePostDto, InputDeletePostDto, InputListPostsDto, OutputCreatePostDto, OutputDeletePostDto, OutputListPostsDto } from "@/business/dto/posts/posts-dto"
 import { PostIsNotFromAuthor, PostNotFound } from "@/business/errors/posts"
 import { IPostRepository } from "@/business/repositories/post-respository"
+import { getCourseMediator } from "@/services/mediator/course-mediator";
+import { deleteUploadedFile } from "@/shared/storageService";
 
 export class PostUseCase {
   constructor(private postRepository: IPostRepository) {}
 
   async create(input: InputCreatePostDto): Promise<OutputCreatePostDto> {
+    const mediator = getCourseMediator(input.courseId);
+    const postCreatorComponent = mediator.getPostCreatorComponent();
+    postCreatorComponent.setMediator(mediator)
     // verify if user is on the course or not to create a post later
-    await this.postRepository.create({ ...input, thread: [] })
+    await postCreatorComponent.createPost({ ...input })
   }
 
   async addThreadOnPost(input: InputAddThreadToPostDto): Promise<OutputCreatePostDto> {
@@ -17,8 +22,11 @@ export class PostUseCase {
       throw new Error(JSON.stringify(PostNotFound))
     }
 
-    const newThreads = post.thread ? [ ...post.thread, input.thread ] : [input.thread]
-    await this.postRepository.update({ postId: input.postId, dataToUpdate: { thread: newThreads }})
+    const mediator = getCourseMediator(post.courseId);
+    const addThreadComponent = mediator.getAddThreadComponent();
+    addThreadComponent.setMediator(mediator)
+
+    await addThreadComponent.addThread({ authorId: input.userId, courseId: post.courseId, postId: input.postId, file: input.thread.file, message: input.thread.message })
   }
 
   async delete(input: InputDeletePostDto): Promise<OutputDeletePostDto> {
@@ -31,6 +39,7 @@ export class PostUseCase {
       throw new Error(JSON.stringify(PostIsNotFromAuthor))
     }
     await this.postRepository.delete({ postId: input.postId })
+    if(post.file) await deleteUploadedFile(post.file?.url)
   }
 
   async list(input: InputListPostsDto): Promise<OutputListPostsDto> {

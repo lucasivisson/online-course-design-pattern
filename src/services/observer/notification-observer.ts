@@ -52,7 +52,8 @@ class NotificationObserver implements INotificationObserver {
 
   public async notify(
     message: string,
-    senderId: string
+    senderId: string,
+    exceptionId?: string
   ): Promise<NotificationEntity | void> {
     if (this.observers.length === 0) {
       console.log("Nenhum observador para notificar.");
@@ -62,7 +63,7 @@ class NotificationObserver implements INotificationObserver {
     const notificationData = {
       message: message,
       senderId: senderId,
-      receiversIds: this.observers.map((observerId) => observerId),
+      receiversIds: this.observers.filter((observerId) => observerId !== exceptionId),
       readBy: [],
     };
 

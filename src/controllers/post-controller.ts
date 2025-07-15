@@ -10,6 +10,7 @@ import {
   InputDeletePostDto,
   InputListPostsDto,
 } from "@/business/dto/posts/posts-dto";
+import { USER_ID } from "@/shared/constants";
 
 export class PostController {
   private postUseCase: PostUseCase;
@@ -43,14 +44,27 @@ export class PostController {
 
   async create(req: NextRequest) {
     try {
-      const post = await req.json();
+      const formData = await req.formData();
 
-      const dto = plainToInstance(InputCreatePostDto, post);
-      const errors = await validate(dto);
+      const courseId = formData.get('courseId') as string;
+      const message = formData.get('message') as string;
+      const file = formData.get('file') as File | null;
+
+      const input = plainToInstance(InputCreatePostDto, {
+        courseId,
+        authorId: USER_ID,
+        message,
+        file: file && {
+          fileBuffer: Buffer.from(await file.arrayBuffer()),
+          fileName: file.name,
+          type: file.type,
+        },
+      });
+      const errors = await validate(input);
 
       if (errors.length > 0) return errorHandler(errors);
 
-      await this.postUseCase.create(post);
+      await this.postUseCase.create(input);
 
       return new Response(null, {
         status: 204,
@@ -68,18 +82,29 @@ export class PostController {
 
   async addThreadOnPost(req: NextRequest, userId: string, postId: string) {
     try {
-      const thread = await req.json();
+      const formData = await req.formData();
 
-      const dto = plainToInstance(InputAddThreadToPostDto, {
+      const message = formData.get('message') as string;
+      const file = formData.get('file') as File | null;
+
+      const input = plainToInstance(InputAddThreadToPostDto, {
         userId,
         postId,
-        thread,
+        thread: {
+          message,
+          authorId: userId,
+          file: file && {
+            fileBuffer: Buffer.from(await file.arrayBuffer()),
+            fileName: file.name,
+            type: file.type,
+          },
+        },
       });
-      const errors = await validate(dto);
+      const errors = await validate(input);
 
       if (errors.length > 0) return errorHandler(errors);
 
-      await this.postUseCase.addThreadOnPost(thread);
+      await this.postUseCase.addThreadOnPost(input);
 
       return new Response(null, {
         status: 204,
@@ -97,6 +122,7 @@ export class PostController {
 
   async list(userId: string, courseId: string) {
     try {
+      console.log('{ userId, courseId }', { userId, courseId })
       const dto = plainToInstance(InputListPostsDto, { userId, courseId });
       const errors = await validate(dto);
 
