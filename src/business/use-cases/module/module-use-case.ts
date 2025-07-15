@@ -25,24 +25,26 @@ export class ModuleUseCase {
   async create(data: InputCreateModuleDto): Promise<OutputCreateModuleDto> {
     let invalidQuiz = false;
 
-    for (let index = 0; index < data.classes.length; index++) {
-      if (data.classes[index].quizId) {
-        const quiz = await this.quizRepository.get({
-          quizId: data.classes[index].quizId!,
-        });
+    if (data.classes && data.classes.length > 0) {
+      for (let index = 0; index < data.classes.length; index++) {
+        if (data.classes[index].quizId) {
+          const quiz = await this.quizRepository.get({
+            quizId: data.classes[index].quizId!,
+          });
 
-        if (!quiz && !invalidQuiz) {
-          invalidQuiz = true;
+          if (!quiz && !invalidQuiz) {
+            invalidQuiz = true;
+          }
         }
       }
-    }
 
-    if (invalidQuiz) {
-      throw new Error(
-        "Invalid quiz. Please provide an id that matches with a quiz."
-      );
+      if (invalidQuiz) {
+        throw new Error(
+          "Invalid quiz. Please provide an id that matches with a quiz."
+        );
+      }
     }
-
+    console.log(data.coursesIds);
     return await this.moduleRepository.create(data);
   }
 
@@ -51,6 +53,27 @@ export class ModuleUseCase {
   }
 
   async update(data: InputUpdateModuleDto): Promise<OutputUpdateModuleDto> {
+    let invalidQuiz = false;
+
+    if (data.classes && data.classes.length > 0) {
+      for (let index = 0; index < data.classes.length; index++) {
+        if (data.classes[index].quizId) {
+          const quiz = await this.quizRepository.get({
+            quizId: data.classes[index].quizId!,
+          });
+
+          if (!quiz && !invalidQuiz) {
+            invalidQuiz = true;
+          }
+        }
+      }
+
+      if (invalidQuiz) {
+        throw new Error(
+          "Invalid quiz. Please provide an id that matches with a quiz."
+        );
+      }
+    }
     return await this.moduleRepository.update(data);
   }
 

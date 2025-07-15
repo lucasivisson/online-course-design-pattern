@@ -17,7 +17,7 @@ export const DELETE = async (_: NextRequest, { params }: Params) => {
   const { moduleId } = await params;
   return controller.delete({ moduleId });
 };
-export const PUT = async (req: NextRequest, { params }: Params) => {
+export const PATCH = async (req: NextRequest, { params }: Params) => {
   const { moduleId } = await params;
   return controller.update(req, moduleId);
 };

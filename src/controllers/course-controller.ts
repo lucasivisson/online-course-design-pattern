@@ -11,9 +11,6 @@ import { validate } from "class-validator";
 import { errorHandler } from "@/shared/http-handler";
 import { CourseUseCase } from "@/business/use-cases/course/course-use-case";
 import { PrismaCourseRepository } from "@/framework/repositories/prisma-course-repository";
-import { PrismaQuizRepository } from "@/framework/repositories/prisma-quiz-repository";
-import { ModuleUseCase } from "@/business/use-cases/module/module-use-case";
-import { PrismaModuleRepository } from "@/framework/repositories/prisma-module-repository";
 import { PrismaUserRepository } from "@/framework/repositories/mongo-user-repository";
 
 export class CourseController {
@@ -22,10 +19,6 @@ export class CourseController {
   constructor() {
     this.courseUseCase = new CourseUseCase(
       new PrismaCourseRepository(),
-      new ModuleUseCase(
-        new PrismaModuleRepository(),
-        new PrismaQuizRepository()
-      ),
       new PrismaUserRepository()
     );
   }

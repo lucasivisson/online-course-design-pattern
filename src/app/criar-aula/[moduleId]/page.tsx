@@ -1,19 +1,115 @@
 "use client";
+import { api } from "@/config/api";
+import { useParams, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 
-import { useState } from "react";
+import toast from "react-hot-toast";
+
+interface Quiz {
+  id: string;
+  title: string;
+}
 
 export default function CreateClassPage() {
+  const router = useRouter();
+  const params = useParams();
+  const moduleId = params.moduleId as string;
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(
     "Selecione um tipo de aula"
   );
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [isLoadingQuizzes, setIsLoadingQuizzes] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [isDropdownQuizOpen, setIsDropdownQuizOpen] = useState(false);
-  const [selectedQuiz, setSelectedQuiz] = useState("Selecione um quiz");
+  // Estado do formulário
+  const [formData, setFormData] = useState({
+    name: "",
+    textContent: "",
+    videoUrl: "",
+    quizId: "",
+  });
 
-  const categories = ["Texto", "Vídeo", "Quiz"];
+  // Busca os quizzes disponíveis
+  useEffect(() => {
+    if (selectedCategory === "Quiz") {
+      fetchQuizzes();
+    }
+  }, [selectedCategory]);
 
-  const quizzes = ["Quiz 1", "Quiz 2", "Quiz 3"];
+  const fetchQuizzes = async () => {
+    setIsLoadingQuizzes(true);
+    try {
+      const response = await api.get<Quiz[]>("/api/quiz");
+      setQuizzes(response);
+    } catch (error) {
+      toast.error("Erro ao carregar quizzes");
+      console.error("Failed to fetch quizzes:", error);
+    } finally {
+      setIsLoadingQuizzes(false);
+    }
+  };
+
+  const categories = [
+    { label: "Texto", value: "text" },
+    { label: "Vídeo", value: "video" },
+    { label: "Quiz", value: "quiz" },
+  ];
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      // Monta o objeto da classe conforme o tipo selecionado
+      let classData;
+      switch (selectedCategory) {
+        case "text":
+          classData = {
+            type: "text",
+            name: formData.name,
+            textContent: formData.textContent,
+          };
+          break;
+        case "video":
+          classData = {
+            type: "video",
+            name: formData.name,
+            videoUrl: formData.videoUrl,
+          };
+          break;
+        case "quiz":
+          classData = {
+            type: "quiz",
+            name: formData.name,
+            quizId: formData.quizId,
+          };
+          break;
+        default:
+          throw new Error("Tipo de aula inválido");
+      }
+
+      // Faz o PATCH para adicionar a classe ao módulo
+      await api.patch(`/api/module/${moduleId}`, {
+        classes: [classData], // Envia como array conforme esperado pelo backend
+      });
+
+      toast.success("Aula criada com sucesso!");
+      router.back();
+    } catch (error) {
+      const err = error as Error;
+      console.error("Erro ao criar aula:", err);
+      toast.error(err.message || "Erro ao criar aula");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
@@ -53,19 +149,23 @@ export default function CreateClassPage() {
           Informações da Aula
         </h2>
 
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
             <label
-              htmlFor="course-name"
+              htmlFor="class-name"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Nome do Aula <span className="text-red-500">*</span>
+              Nome da Aula <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              id="course-name"
+              id="class-name"
+              name="name"
               className="placeholder:text-gray-500 text-gray-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border"
-              placeholder="Ex: Padrões de Software, React Avançado, Node.js..."
+              placeholder="Ex: Introdução ao React, Fundamentos de Node.js..."
+              value={formData.name}
+              onChange={handleInputChange}
+              required
             />
           </div>
 
@@ -79,7 +179,10 @@ export default function CreateClassPage() {
                 className="w-full text-left bg-white border border-gray-300 rounded-md px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               >
-                <span className="block truncate">{selectedCategory}</span>
+                <span className="block truncate">
+                  {categories.find((c) => c.value === selectedCategory)
+                    ?.label || "Selecione um tipo de aula"}
+                </span>
                 <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                   <svg
                     className="h-4 w-4 text-gray-400"
@@ -98,17 +201,17 @@ export default function CreateClassPage() {
 
               {isDropdownOpen && (
                 <ul className="text-gray-500 absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg overflow-hidden">
-                  {categories.map((category, index) => (
+                  {categories.map((category) => (
                     <li
-                      key={index}
+                      key={category.value}
                       className="px-3 py-1.5 text-sm hover:bg-blue-50 cursor-pointer flex items-center"
                       onClick={() => {
-                        setSelectedCategory(category);
+                        setSelectedCategory(category.value);
                         setIsDropdownOpen(false);
                       }}
                     >
-                      {category}
-                      {selectedCategory === category && (
+                      {category.label}
+                      {selectedCategory === category.value && (
                         <span className="ml-auto">
                           <svg
                             className="h-4 w-4 text-blue-500"
@@ -131,100 +234,75 @@ export default function CreateClassPage() {
             </div>
           </div>
 
-          {selectedCategory === "Texto" && (
+          {selectedCategory === "text" && (
             <div>
               <label
-                htmlFor="course-name"
+                htmlFor="textContent"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
                 Conteúdo do Texto <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
-                id="course-name"
+                id="textContent"
+                name="textContent"
                 className="placeholder:text-gray-500 text-gray-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border"
                 placeholder="Ex: PDF transcrição, links externos..."
+                value={formData.textContent}
+                onChange={handleInputChange}
+                required
               />
             </div>
           )}
 
-          {selectedCategory === "Texto" && (
+          {selectedCategory === "video" && (
             <div>
               <label
-                htmlFor="course-name"
+                htmlFor="videoUrl"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Vídeo <span className="text-red-500">*</span>
+                URL do Vídeo <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
-                id="course-name"
+                id="videoUrl"
+                name="videoUrl"
                 className="placeholder:text-gray-500 text-gray-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border"
-                placeholder="Ex: Link do vídeo, descrição..."
+                placeholder="Ex: https://youtube.com/embed/..."
+                value={formData.videoUrl}
+                onChange={handleInputChange}
+                required
               />
             </div>
           )}
 
-          {selectedCategory === "Quiz" && (
+          {selectedCategory === "quiz" && (
             <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Tipo de Aula <span className="text-red-500">*</span>
+                Selecione um Quiz <span className="text-red-500">*</span>
               </label>
               <div className="relative text-gray-500">
-                <button
-                  type="button"
+                <select
+                  name="quizId"
+                  value={formData.quizId}
+                  onChange={(e) =>
+                    setFormData({ ...formData, quizId: e.target.value })
+                  }
                   className="w-full text-left bg-white border border-gray-300 rounded-md px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                  onClick={() => setIsDropdownQuizOpen(!isDropdownQuizOpen)}
+                  required
+                  disabled={isLoadingQuizzes}
                 >
-                  <span className="block truncate">{selectedQuiz}</span>
-                  <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                    <svg
-                      className="h-4 w-4 text-gray-400"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </span>
-                </button>
-
-                {isDropdownQuizOpen && (
-                  <ul className="text-gray-500 absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg overflow-hidden">
-                    {quizzes.map((quiz, index) => (
-                      <li
-                        key={index}
-                        className="px-3 py-1.5 text-sm hover:bg-blue-50 cursor-pointer flex items-center"
-                        onClick={() => {
-                          setSelectedQuiz(quiz);
-                          setIsDropdownQuizOpen(false);
-                        }}
-                      >
-                        {quiz}
-                        {selectedQuiz === quiz && (
-                          <span className="ml-auto">
-                            <svg
-                              className="h-4 w-4 text-blue-500"
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          </span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                  <option value="">
+                    {isLoadingQuizzes
+                      ? "Carregando quizzes..."
+                      : "Selecione um quiz"}
+                  </option>
+                  {quizzes.map((quiz) => (
+                    <option key={quiz.id} value={quiz.id}>
+                      {quiz.title}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
           )}
@@ -232,9 +310,14 @@ export default function CreateClassPage() {
           <div className="flex justify-end pt-4">
             <button
               type="submit"
-              className="cursor-pointer inline-flex justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              disabled={isSubmitting}
+              className={`inline-flex justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                isSubmitting
+                  ? "opacity-75 cursor-not-allowed"
+                  : "cursor-pointer"
+              }`}
             >
-              Criar Aula
+              {isSubmitting ? "Criando..." : "Criar Aula"}
             </button>
           </div>
         </form>

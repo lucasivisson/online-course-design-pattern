@@ -35,6 +35,7 @@ export class PrismaCourseRepository implements ICourseRepository {
           },
         },
         posts: true,
+        modules: true,
       },
     });
   }
@@ -53,6 +54,9 @@ export class PrismaCourseRepository implements ICourseRepository {
   }
 
   async update(input: InputUpdateCourseDto): Promise<CourseEntity> {
+    const moduleData = await this.get({ courseId: input.courseId });
+
+    const latestsModules = moduleData?.modulesIds || [];
     const data = await prisma.course.update({
       where: { id: input.courseId },
       data: {
@@ -60,6 +64,7 @@ export class PrismaCourseRepository implements ICourseRepository {
         description: input.description,
         price: input.price,
         professorId: input.professorId,
+        modulesIds: [...latestsModules, ...(input.modulesIds || [])],
       },
     });
 
@@ -89,6 +94,7 @@ export class PrismaCourseRepository implements ICourseRepository {
           },
         },
         posts: true,
+        modules: true,
       },
     });
 
@@ -106,7 +112,6 @@ export class PrismaCourseRepository implements ICourseRepository {
     if (input.id && !isValidObjectId(input.id)) {
       return null;
     }
-    console.log(input);
 
     return await prisma.course.findUnique({
       where: input as Prisma.CourseWhereUniqueInput,
@@ -128,6 +133,7 @@ export class PrismaCourseRepository implements ICourseRepository {
           },
         },
         posts: true,
+        modules: true,
       },
     });
   }

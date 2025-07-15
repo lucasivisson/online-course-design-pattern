@@ -1,15 +1,12 @@
-import { Type } from "class-transformer";
 import {
   IsString,
   IsNotEmpty,
   IsArray,
-  ValidateNested,
   IsInt,
   Min,
   IsOptional,
 } from "class-validator";
 import { CourseEntity } from "@/entities/course-entity";
-import { InputCreateModuleDto } from "@/business/dto/module/module-dto";
 
 export class InputCreateCourseDto {
   @IsString()
@@ -55,10 +52,8 @@ export class InputUpdateCourseDto {
   price?: number;
 
   @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => InputCreateModuleDto)
   @IsOptional()
-  modules?: InputCreateModuleDto[];
+  modulesIds?: string[];
 }
 
 export class InputGetCourseDto {

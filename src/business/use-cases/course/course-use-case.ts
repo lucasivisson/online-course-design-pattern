@@ -10,13 +10,11 @@ import {
   OutputUpdateCourseDto,
 } from "@/business/dto/course/course-dto";
 import { ICourseRepository } from "@/business/repositories/course-repository";
-import { ModuleUseCase } from "@/business/use-cases/module/module-use-case";
 import { IUserRepository } from "@/business/repositories/user-repository";
 
 export class CourseUseCase {
   constructor(
     private courseRepository: ICourseRepository,
-    private moduleUseCase: ModuleUseCase,
     private userRepository: IUserRepository
   ) {}
 
@@ -49,16 +47,6 @@ export class CourseUseCase {
         throw new Error("Invalid teacher id. Please provide a valid id.");
     }
     const course = await this.courseRepository.update(data);
-
-    if (data.modules) {
-      for (let index = 0; index < data.modules.length; index++) {
-        const element = data.modules[index];
-        await this.moduleUseCase.create({
-          ...element,
-          coursesIds: [course.id],
-        });
-      }
-    }
 
     return (await this.courseRepository.get({ courseId: course.id }))!;
   }

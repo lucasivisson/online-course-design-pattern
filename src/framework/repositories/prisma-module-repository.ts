@@ -20,25 +20,6 @@ export class PrismaModuleRepository implements IModuleRepository {
     const data = await prisma.module.create({
       data: {
         ...input,
-        classes: input.classes.map((value) => {
-          return {
-            ...value,
-            id: uuidv4(),
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          };
-        }),
-      },
-    });
-
-    return data;
-  }
-
-  async update(input: InputUpdateModuleDto): Promise<ModuleEntity> {
-    const data = await prisma.module.update({
-      where: { id: input.moduleId },
-      data: {
-        name: input.name,
         classes: input.classes
           ? input.classes.map((value) => {
               return {
@@ -48,6 +29,33 @@ export class PrismaModuleRepository implements IModuleRepository {
                 updatedAt: new Date(),
               };
             })
+          : [],
+      },
+    });
+
+    return data;
+  }
+
+  async update(input: InputUpdateModuleDto): Promise<ModuleEntity> {
+    const moduleData = await this.get({ moduleId: input.moduleId });
+
+    const latestsClasses = moduleData?.classes || [];
+    const data = await prisma.module.update({
+      where: { id: input.moduleId },
+      data: {
+        name: input.name,
+        classes: input.classes
+          ? [
+              ...latestsClasses,
+              ...input.classes.map((value) => {
+                return {
+                  ...value,
+                  id: uuidv4(),
+                  createdAt: new Date(),
+                  updatedAt: new Date(),
+                };
+              }),
+            ]
           : undefined,
       },
     });

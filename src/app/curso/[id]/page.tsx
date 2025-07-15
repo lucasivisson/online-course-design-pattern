@@ -1,110 +1,86 @@
 "use client";
 
-import { ModuleEntity } from "@/entities/module-entity";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { api } from "@/config/api";
+import { CourseEntity } from "@/entities/course-entity";
+import { useParams, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 
 export default function CourseManagement() {
   const router = useRouter();
-  const [modules] = useState<ModuleEntity[]>([
-    {
-      id: "123",
-      name: "Módulo 1: Introdução aos Padrões",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      classes: [
-        {
-          id: "12345",
-          name: "O que são Padrões de Software",
-          type: "video",
-          videoUrl: "https://example.com/video1.mp4",
-          quizId: null,
-          textContent: null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: "12346",
-          name: "História e Evolução",
-          type: "text",
-          quizId: null,
-          videoUrl: null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          textContent: "Conteúdo sobre a história dos padrões de software.",
-        },
-        {
-          id: "12347",
-          name: "Quiz: Conceitos Básicos",
-          type: "quiz",
-          quizId: "quiz123",
-          videoUrl: null,
-          textContent: null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ],
-    },
-    {
-      id: "124",
-      name: "Módulo 2: Padrões Criacionais",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      classes: [
-        {
-          id: "12348",
-          name: "Singleton Pattern",
-          type: "video",
-          videoUrl: "https://example.com/video2.mp4",
-          quizId: null,
-          textContent: null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: "12349",
-          name: "Builder Pattern",
-          type: "text",
-          videoUrl: null,
-          quizId: null,
-          textContent: "Conteúdo sobre o padrão Builder.",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: "12350",
-          name: "Factory Pattern",
-          type: "quiz",
-          videoUrl: null,
-          quizId: "quiz124",
-          textContent: null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ],
-    },
-  ]);
+  const params = useParams();
+  const courseId = params.id as string;
 
-  const onHandleCreateLesson = () => {
-    router.push("/criar-aula");
+  const [course, setCourse] = useState<CourseEntity | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCourseData = async () => {
+      setIsLoading(true);
+      try {
+        const courseData = await api.get<{ course: CourseEntity }>(
+          `/api/course/${courseId}`
+        );
+        console.log("Course data:", courseData);
+        setCourse(courseData.course);
+      } catch (error) {
+        toast.error("Erro ao carregar dados do curso");
+        console.error("Failed to fetch course:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (courseId) {
+      fetchCourseData();
+    }
+  }, [courseId]);
+
+  const onHandleCreateLesson = (moduleId: string) => {
+    router.push(`/criar-aula/${moduleId}`);
   };
 
   const onHandleCreateModule = () => {
-    router.push("/criar-modulo");
+    router.push(`/criar-modulo/${courseId}`);
   };
+
+  if (isLoading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="flex justify-center items-center h-64">
+          <p>Carregando curso...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!course) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="flex justify-center items-center h-64">
+          <h1 className="text-3xl font-bold text-gray-900">
+            Curso não encontrado
+          </h1>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <header className="flex justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            Gerenciar Curso: Padrões de Software
+            Gerenciar Curso: {course.name}
           </h1>
           <div className="flex gap-6 mt-4 text-gray-600">
-            <span>45 alunos inscritos</span>
-            <span>{modules.length} módulos</span>
+            <span>{course.enrollments?.length} alunos inscritos</span>
+            <span>{course.modules?.length} módulos</span>
             <span>
-              {modules.reduce((acc, module) => acc + module.classes.length, 0)}{" "}
+              {course.modules?.reduce(
+                (acc, module) => acc + module.classes.length,
+                0
+              )}{" "}
               aulas
             </span>
           </div>
@@ -154,63 +130,15 @@ export default function CourseManagement() {
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M10.75 1.33325H4.74996C4.39634 1.33325 4.0572 1.47373 3.80715 1.72378C3.5571 1.97382 3.41663 2.31296 3.41663 2.66659V13.3333C3.41663 13.6869 3.5571 14.026 3.80715 14.2761C4.0572 14.5261 4.39634 14.6666 4.74996 14.6666H12.75C13.1036 14.6666 13.4427 14.5261 13.6928 14.2761C13.9428 14.026 14.0833 13.6869 14.0833 13.3333V4.66659L10.75 1.33325Z"
-              stroke="white"
-              strokeWidth="1.33333"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M10.0834 1.33325V3.99992C10.0834 4.35354 10.2239 4.69268 10.4739 4.94273C10.7239 5.19278 11.0631 5.33325 11.4167 5.33325H14.0834"
-              stroke="white"
-              strokeWidth="1.33333"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M7.41671 6H6.08337"
-              stroke="white"
-              strokeWidth="1.33333"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M11.4167 8.66675H6.08337"
-              stroke="white"
-              strokeWidth="1.33333"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M11.4167 11.3333H6.08337"
+              d="M4 2L13.3333 8L4 14V2Z"
               stroke="white"
               strokeWidth="1.33333"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
           </svg>
-
           <span className="font-medium">Publicar trabalho</span>
         </button>
-        {/* <button className="flex cursor-pointer justify-center items-center gap-2 w-[25%] py-4 px-2 text-white bg-[#9333EA] hover:bg-[#9233eabb] rounded-md transition-colors duration-200">
-          <svg
-            width="17"
-            height="16"
-            viewBox="0 0 17 16"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M13.5219 5.23337C13.4892 5.44803 13.5612 5.66537 13.7145 5.8187L14.7599 6.86403C15.0732 7.17737 15.2305 7.5887 15.2305 8.00003C15.2305 8.41137 15.0739 8.82203 14.7599 9.13603L13.6859 10.21C13.6137 10.2821 13.5256 10.3363 13.4287 10.3683C13.3318 10.4002 13.2288 10.4091 13.1279 10.394C12.8145 10.3474 12.5932 10.074 12.4825 9.77737C12.3854 9.51522 12.224 9.2817 12.013 9.09828C11.8021 8.91485 11.5484 8.78742 11.2753 8.72769C11.0022 8.66795 10.7184 8.67785 10.4502 8.75646C10.1819 8.83506 9.9377 8.97986 9.74003 9.17753C9.54236 9.3752 9.39756 9.6194 9.31896 9.88767C9.24035 10.1559 9.23046 10.4397 9.29019 10.7128C9.34992 10.9859 9.47735 11.2396 9.66078 11.4505C9.8442 11.6615 10.0777 11.8229 10.3399 11.92C10.6372 12.0307 10.9099 12.2514 10.9565 12.5654C10.9716 12.6663 10.9628 12.7693 10.9309 12.8662C10.8989 12.9631 10.8447 13.0512 10.7725 13.1234L9.6992 14.1967C9.55013 14.3463 9.37297 14.4649 9.1779 14.5458C8.98284 14.6267 8.77371 14.6682 8.56253 14.668C8.35151 14.6683 8.14251 14.6269 7.94756 14.5461C7.7526 14.4653 7.57553 14.3468 7.42653 14.1974L6.3812 13.152C6.30564 13.0763 6.21339 13.0194 6.11185 12.9858C6.01031 12.9523 5.90232 12.943 5.79653 12.9587C5.46787 13.008 5.23653 13.2947 5.11653 13.604C5.01595 13.8622 4.85259 14.0912 4.64123 14.2704C4.42987 14.4495 4.17718 14.5732 3.90602 14.6301C3.63485 14.687 3.35378 14.6755 3.08821 14.5964C2.82265 14.5174 2.58097 14.3734 2.38505 14.1775C2.18913 13.9816 2.04514 13.7399 1.96612 13.4744C1.8871 13.2088 1.87553 12.9277 1.93246 12.6565C1.98939 12.3854 2.11302 12.1327 2.29218 11.9213C2.47134 11.71 2.70036 11.5466 2.95853 11.446C3.26787 11.326 3.55453 11.0947 3.6032 10.766C3.61901 10.6603 3.60982 10.5523 3.57636 10.4508C3.5429 10.3493 3.4861 10.257 3.41053 10.1814L2.3652 9.13603C2.21576 8.98703 2.09725 8.80996 2.01648 8.61501C1.93571 8.42005 1.89426 8.21106 1.89453 8.00003C1.89453 7.5887 2.05187 7.17737 2.3652 6.86403L3.38253 5.8467C3.54253 5.6867 3.76987 5.61137 3.99387 5.6447C4.3372 5.69603 4.57853 5.9967 4.7092 6.31803C4.813 6.57253 4.97813 6.79741 5.18988 6.97264C5.40163 7.14787 5.65343 7.26801 5.92285 7.32236C6.19227 7.37672 6.47096 7.3636 6.73408 7.28417C6.99721 7.20474 7.23661 7.06147 7.43096 6.86712C7.62531 6.67277 7.76857 6.43337 7.848 6.17025C7.92743 5.90712 7.94055 5.62844 7.8862 5.35902C7.83184 5.08959 7.7117 4.83779 7.53647 4.62604C7.36124 4.41429 7.13636 4.24916 6.88187 4.14537C6.56053 4.0147 6.25987 3.77337 6.20853 3.43003C6.1752 3.20603 6.24987 2.97937 6.41053 2.8187L7.4272 1.80203C7.57618 1.6528 7.75316 1.53446 7.94799 1.4538C8.14282 1.37315 8.35167 1.33176 8.56253 1.33203C8.97387 1.33203 9.3852 1.48937 9.69853 1.8027L10.7439 2.84803C10.8972 3.00137 11.1145 3.07337 11.3285 3.04137C11.6572 2.99203 11.8885 2.70537 12.0085 2.39603C12.1091 2.13786 12.2725 1.90884 12.4838 1.72968C12.6952 1.55052 12.9479 1.42689 13.219 1.36996C13.4902 1.31303 13.7713 1.3246 14.0369 1.40362C14.3024 1.48264 14.5441 1.62663 14.74 1.82255C14.9359 2.01847 15.0799 2.26015 15.1589 2.52571C15.238 2.79128 15.2495 3.07235 15.1926 3.34352C15.1357 3.61468 15.012 3.86737 14.8329 4.07873C14.6537 4.29009 14.4247 4.45345 14.1665 4.55403C13.8572 4.67403 13.5705 4.9047 13.5219 5.23337Z"
-              stroke="white"
-              stroke-width="1.33333"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-
-          <span className="font-medium">Criar quiz</span>
-        </button> */}
       </div>
       <hr />
       <div className="mt-4">
@@ -218,7 +146,10 @@ export default function CourseManagement() {
           <h2 className="text-2xl font-semibold text-gray-900">
             Estrutura do Curso
           </h2>
-          <button className="flex items-center justify-between font-medium cursor-pointer py-3 px-2 w-[200px] bg-[#2563EB] hover:bg-[#2564ebd8] text-white rounded-md">
+          <button
+            className="flex items-center justify-between font-medium cursor-pointer py-3 px-2 w-[200px] bg-[#2563EB] hover:bg-[#2564ebd8] text-white rounded-md"
+            onClick={onHandleCreateModule}
+          >
             <svg
               width="17"
               height="16"
@@ -241,11 +172,11 @@ export default function CourseManagement() {
                 strokeLinejoin="round"
               />
             </svg>
-            <span onClick={onHandleCreateModule}>Adicionar Módulo</span>
+            <span>Adicionar Módulo</span>
             <div />
           </button>
         </div>
-        {modules.map((module) => (
+        {course.modules?.map((module) => (
           <div
             key={module.id}
             className="bg-white rounded-lg shadow border mb-6 overflow-hidden"
@@ -259,7 +190,10 @@ export default function CourseManagement() {
                   {module.classes.length} aulas
                 </span>
               </div>
-              <button className="flex items-center justify-between font-medium cursor-pointer py-2 px-2 w-[140px] bg-[#16A34A] hover:bg-[#16a34ac4] text-white rounded-md">
+              <button
+                className="flex items-center justify-between font-medium cursor-pointer py-2 px-2 w-[140px] bg-[#16A34A] hover:bg-[#16a34ac4] text-white rounded-md"
+                onClick={() => onHandleCreateLesson(module.id)}
+              >
                 <svg
                   width="17"
                   height="16"
@@ -282,7 +216,10 @@ export default function CourseManagement() {
                     strokeLinejoin="round"
                   />
                 </svg>
-                <span onClick={onHandleCreateLesson} className="text-[14px]">
+                <span
+                  onClick={() => onHandleCreateLesson(module.id)}
+                  className="text-[14px]"
+                >
                   Adicionar Aula
                 </span>
                 <div />
@@ -290,7 +227,7 @@ export default function CourseManagement() {
             </div>
 
             <div className="divide-y">
-              {module.classes.map((lesson) => (
+              {module.classes?.map((lesson) => (
                 <div key={lesson.id} className="p-4 hover:bg-gray-50">
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
@@ -312,7 +249,6 @@ export default function CourseManagement() {
                                 strokeLinejoin="round"
                               />
                             </svg>
-
                             <div className="bg-[#F3F4F6] px-[5px] rounded-md">
                               <span className="text-[#6B7280] text-[12px] font-medium">
                                 Vídeo
@@ -365,7 +301,6 @@ export default function CourseManagement() {
                                 strokeLinejoin="round"
                               />
                             </svg>
-
                             <div className="bg-[#F3F4F6] px-[5px] rounded-md">
                               <span className="text-[#6B7280] text-[12px] font-medium">
                                 Texto
@@ -411,7 +346,6 @@ export default function CourseManagement() {
                                 </clipPath>
                               </defs>
                             </svg>
-
                             <div className="bg-[#F3F4F6] px-[5px] rounded-md">
                               <span className="text-[#6B7280] text-[12px] font-medium">
                                 Quiz
@@ -496,11 +430,6 @@ export default function CourseManagement() {
                           />
                         </svg>
                       </span>
-                      <input
-                        type="checkbox"
-                        onChange={() => {}}
-                        className="h-5 w-5 text-blue-600 rounded"
-                      />
                     </div>
                   </div>
                 </div>
