@@ -3,7 +3,7 @@
 import { api } from "@/config/api";
 import { CourseEntity } from "@/entities/course-entity";
 import { useParams, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
 import { FaSpinner } from "react-icons/fa";
 import Modal from "react-modal";
@@ -43,27 +43,27 @@ export default function CourseManagement() {
     classId: string;
   } | null>(null);
 
-  useEffect(() => {
-    const fetchCourseData = async () => {
-      setIsLoading(true);
-      try {
-        const courseData = await api.get<{ course: CourseEntity }>(
-          `/api/course/${courseId}`
-        );
-        console.log("Course data:", courseData);
-        setCourse(courseData.course);
-      } catch (error) {
-        toast.error("Erro ao carregar dados do curso");
-        console.error("Failed to fetch course:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchCourseData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const courseData = await api.get<{ course: CourseEntity }>(
+        `/api/course/${courseId}`
+      );
+      console.log("Course data:", courseData);
+      setCourse(courseData.course);
+    } catch (error) {
+      toast.error("Erro ao carregar dados do curso");
+      console.error("Failed to fetch course:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [courseId]);
 
+  useEffect(() => {
     if (courseId) {
       fetchCourseData();
     }
-  }, [courseId]);
+  }, [courseId, fetchCourseData]);
 
   const onHandleCreateLesson = (moduleId: string) => {
     router.push(`/criar-aula/${moduleId}`);
@@ -98,9 +98,7 @@ export default function CourseManagement() {
 
       closeDeleteModal();
 
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      await fetchCourseData();
     } catch (err) {
       const error = err as Error;
       console.error("Erro ao excluir aula:", error);
@@ -156,14 +154,14 @@ export default function CourseManagement() {
           <div className="flex justify-end gap-3">
             <button
               onClick={closeDeleteModal}
-              className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
+              className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md cursor-pointer"
               disabled={isDeleting}
             >
               Cancelar
             </button>
             <button
               onClick={onHandleDeleteLesson}
-              className={`px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-md ${
+              className={`px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-md cursor-pointer ${
                 isDeleting ? "opacity-70 cursor-not-allowed" : ""
               }`}
               disabled={isDeleting}
