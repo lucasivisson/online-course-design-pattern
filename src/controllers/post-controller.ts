@@ -10,6 +10,7 @@ import {
   InputDeletePostDto,
   InputListPostsDto,
 } from "@/business/dto/posts/posts-dto";
+import { USER_ID } from "@/shared/constants";
 
 export class PostController {
   private postUseCase: PostUseCase;
@@ -46,13 +47,12 @@ export class PostController {
       const formData = await req.formData();
 
       const courseId = formData.get('courseId') as string;
-      const authorId = formData.get('authorId') as string;
       const message = formData.get('message') as string;
       const file = formData.get('file') as File | null;
 
       const input = plainToInstance(InputCreatePostDto, {
         courseId,
-        authorId,
+        authorId: USER_ID,
         message,
         file: file && {
           fileBuffer: Buffer.from(await file.arrayBuffer()),

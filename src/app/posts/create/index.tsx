@@ -4,16 +4,18 @@ import React, { useState, useRef } from "react";
 
 const DocumentUploader = () => {
   const [message, setMessage] = useState("");
-  const [document, setDocument] = useState(null);
-  const fileInputRef = useRef(null);
+  const [document, setDocument] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleFileChange = (event) => {
-    const uploadedFile = event.target.files[0];
-    if (uploadedFile) {
-      setDocument({
-        name: uploadedFile.name,
-        type: uploadedFile.type,
-      });
+  console.log("document", document);
+  console.log("message", message);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const uploadedFile = event.target.files[0] as File;
+      if (uploadedFile) {
+        setDocument(uploadedFile);
+      }
     }
   };
 
@@ -24,7 +26,9 @@ const DocumentUploader = () => {
     }
   };
 
-  const handleMessageChange = (event) => {
+  const handleMessageChange = (event: {
+    target: { value: React.SetStateAction<string> };
+  }) => {
     setMessage(event.target.value);
   };
 
