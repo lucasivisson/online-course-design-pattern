@@ -5,6 +5,7 @@ import { CourseEntity } from "@/entities/course-entity";
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import { FaSpinner } from "react-icons/fa";
 import Modal from "react-modal";
 
 const customStyles = {
@@ -115,11 +116,9 @@ export default function CourseManagement() {
 
   if (isLoading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl m-auto px-4 py-8">
         <div className="flex justify-center items-center h-64">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Carregando curso...
-          </h1>
+          <FaSpinner className="animate-spin text-4xl text-blue-600" />
         </div>
       </div>
     );

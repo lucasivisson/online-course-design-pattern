@@ -33,7 +33,7 @@ export default function CreateClassPage() {
 
   // Busca os quizzes disponíveis
   useEffect(() => {
-    if (selectedCategory === "Quiz") {
+    if (selectedCategory === "quiz") {
       fetchQuizzes();
     }
   }, [selectedCategory]);
@@ -41,8 +41,9 @@ export default function CreateClassPage() {
   const fetchQuizzes = async () => {
     setIsLoadingQuizzes(true);
     try {
-      const response = await api.get<Quiz[]>("/api/quiz");
-      setQuizzes(response);
+      const response = await api.get<{ quiz: Quiz[] }>("/api/quiz");
+      console.log(response);
+      setQuizzes(response.quiz);
     } catch (error) {
       toast.error("Erro ao carregar quizzes");
       console.error("Failed to fetch quizzes:", error);

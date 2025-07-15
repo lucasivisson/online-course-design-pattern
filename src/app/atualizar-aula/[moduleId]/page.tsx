@@ -5,6 +5,7 @@ import { Class } from "@prisma/client";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
+import { FaSpinner } from "react-icons/fa";
 
 interface Quiz {
   id: string;
@@ -127,9 +128,7 @@ export default function UpdateClassPage() {
     return (
       <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="flex justify-center items-center h-64">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Carregando aula...
-          </h1>
+          <FaSpinner className="animate-spin text-4xl text-blue-600" />
         </div>
       </div>
     );

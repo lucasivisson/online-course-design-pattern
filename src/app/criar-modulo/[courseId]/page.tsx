@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useParams, useRouter } from "next/navigation";
 import { api } from "@/config/api";
 import { ModuleEntity } from "@/entities/module-entity";
+import { FaSpinner } from "react-icons/fa";
 
 export default function CreateModulePage() {
   const router = useRouter();
@@ -62,7 +63,7 @@ export default function CreateModulePage() {
     return (
       <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="flex justify-center items-center h-64">
-          <h1 className="text-3xl font-bold text-gray-900">Carregando...</h1>
+          <FaSpinner className="animate-spin text-4xl text-blue-600" />
         </div>
       </div>
     );
