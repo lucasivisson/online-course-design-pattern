@@ -12,7 +12,7 @@ const interSans = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Cursos Online",
+  title: "ElevaCursos",
   description: "Uma plataforma simples e intuitiva para ensinar e aprender",
 };
 
