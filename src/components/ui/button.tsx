@@ -3,7 +3,7 @@ import { ButtonHTMLAttributes, forwardRef } from "react";
 import Link from "next/link";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "blue" | "gray-50";
+  variant?: "blue" | "gray-50" | "link";
   size?: "sm" | "md" | "lg";
   href?: string;
 }
@@ -20,6 +20,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       blue: "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500",
       "gray-50":
         "bg-gray-50 text-gray-900 hover:bg-gray-100 focus:ring-gray-500 border border-gray-200",
+      link: "!p-0 bg-transparent text-blue-600 hover:text-blue-700 focus:ring-blue-500",
     };
 
     const sizes = {

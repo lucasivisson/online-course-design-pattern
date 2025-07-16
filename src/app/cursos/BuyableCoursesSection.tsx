@@ -5,7 +5,6 @@ import { CourseEntity } from "@/entities/course-entity";
 import { CourseCard } from "@/components/CourseCard";
 import { CourseService } from "@/services/course-service";
 import toast from "react-hot-toast";
-import { redirect } from "next/navigation";
 import { XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PaymentMethod } from "@/entities/enrollment-entity";
@@ -56,7 +55,6 @@ export default function BuyableCoursesSection({
       toast.promise(creatingPromise, {
         loading: "Comprando curso...",
         success: () => {
-          setTimeout(() => redirect("/meus-cursos"), 1000);
           return "Curso comprado com sucesso!";
         },
         error: (err) => {
