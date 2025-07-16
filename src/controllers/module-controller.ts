@@ -195,6 +195,7 @@ export class ModuleController {
 
   async duplicate(req: NextRequest, moduleId: string) {
     try {
+      const data = await req.json();
       // Obter o módulo original
       const originalModule = await this.moduleUseCase.get({ moduleId });
       if (!originalModule) {
@@ -213,12 +214,13 @@ export class ModuleController {
 
       // Usar o prototype para criar uma cópia
       const prototype = ModulePrototypeFactory.create(originalModule);
-      const clonedModule = prototype.clone().getClonedModule();
+      const clonedModule = prototype.clone(data.name).getClonedModule();
 
       // Criar o novo módulo no banco de dados
       const moduleDuplicated = await this.moduleUseCase.create({
         name: clonedModule.name,
         classes: clonedModule.classes.map((cls) => ({
+          id: cls.id,
           name: cls.name,
           type: cls.type as ClassType,
           videoUrl: cls.videoUrl || undefined,

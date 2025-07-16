@@ -44,7 +44,7 @@ export class ModuleUseCase {
         );
       }
     }
-    console.log(data.coursesIds);
+
     return await this.moduleRepository.create(data);
   }
 
