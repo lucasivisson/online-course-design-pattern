@@ -1,18 +1,30 @@
-import { CourseEntity } from "@/entities/course-entity";
+import { EnrollmentEntity } from "@/entities/enrollment-entity";
 import { cn } from "@/shared/utils";
 import Image from "next/image";
 
 interface ProgressCourseCardProps {
-  course: CourseEntity;
+  enrollment: EnrollmentEntity;
   onClick?: () => void;
   index: number;
 }
 
 export function ProgressCourseCard({
   index,
-  course,
+  enrollment,
   onClick,
 }: ProgressCourseCardProps) {
+  const { course, finishedModulesIds } = enrollment;
+
+  const progressRate =
+    course.modulesIds.length > 0
+      ? Number(
+          (
+            (finishedModulesIds.length / course.modulesIds.length) *
+            100
+          ).toFixed(0)
+        )
+      : 0;
+
   const getRandomBackgroundColorBasedOnIndex = (index: number) => {
     const colors = [
       "bg-yellow-500/20",
@@ -25,6 +37,7 @@ export function ProgressCourseCard({
     ];
     return colors[index % colors.length];
   };
+  console.log("🟢 course", course);
 
   return (
     <div
@@ -39,7 +52,7 @@ export function ProgressCourseCard({
       >
         <div className="absolute flex text-sm gap-0.5 font-semibold top-3 right-3 text-black/70 px-2 py-0.5 bg-white rounded-lg">
           <Image src="/clock.svg" alt="Clock icon" width={16} height={16} />
-          <span>{80}%</span>
+          <span>{progressRate}%</span>
         </div>
         <Image
           aria-hidden
@@ -68,19 +81,19 @@ export function ProgressCourseCard({
           <div className="flex flex-col w-full">
             <div className="flex items-center w-full  justify-between mb-1">
               <span className="font-semibold">Progresso</span>
-              <span className="font-semibold">{80}%</span>
+              <span className="font-semibold">{progressRate}%</span>
             </div>
             <div className="w-full h-2 bg-gray-100 rounded-full">
               <div
                 className="h-2 bg-black rounded-full transition-all"
-                style={{ width: `${80}%` }}
+                style={{ width: `${progressRate}%` }}
               />
             </div>
           </div>
         </div>
 
         <div className="mt-4 pt-4">
-          {true ? (
+          {progressRate > 0 ? (
             <span className="px-2 py-0.5 text-sm bg-blue-100 text-blue-950 rounded-lg">
               Em andamento
             </span>

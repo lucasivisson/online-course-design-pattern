@@ -31,6 +31,7 @@ export class PrismaCourseRepository implements ICourseRepository {
             createdAt: true,
             courseId: true,
             studentId: true,
+            student: true,
           },
         },
         posts: true,

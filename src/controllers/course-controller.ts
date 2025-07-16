@@ -12,6 +12,7 @@ import { errorHandler } from "@/shared/http-handler";
 import { CourseUseCase } from "@/business/use-cases/course/course-use-case";
 import { PrismaCourseRepository } from "@/framework/repositories/prisma-course-repository";
 import { PrismaUserRepository } from "@/framework/repositories/mongo-user-repository";
+import { handleSuccess } from "@/shared/http-handler";
 
 export class CourseController {
   private courseUseCase: CourseUseCase;
@@ -27,12 +28,7 @@ export class CourseController {
     try {
       const data = await this.courseUseCase.list();
 
-      return new Response(JSON.stringify({ course: data }), {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      return handleSuccess(data);
     } catch (error) {
       console.error("Erro ao consultar curso:", error);
       return new Response(

@@ -68,9 +68,9 @@ export function CourseCard({ index, course, onClick }: CourseCardProps) {
         </div>
 
         <div className="mt-4 pt-4 border-t border-gray-100">
-          <div className="max-xl:flex-col flex items-center justify-between text-xs text-gray-400">
+          <div className="max-xl:flex-col max-xl:gap-4 flex items-center justify-between text-xs text-gray-400">
             <span>
-              <span className="text-xl font-bold text-green-600">
+              <span className="max-xl:text-3xl text-xl font-bold text-green-600">
                 R$ {course.price.toFixed(2)}
               </span>
             </span>

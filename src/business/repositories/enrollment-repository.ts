@@ -8,5 +8,6 @@ export type InputGetEnrollmentBy = Partial<
 export interface IEnrollmentRepository {
   create(input: CreateEnrollment): Promise<EnrollmentEntity>;
   getBy(input: InputGetEnrollmentBy): Promise<EnrollmentEntity | null>;
+  listByUserId(userId: string): Promise<EnrollmentEntity[]>;
   updateBy(input: InputGetEnrollmentBy): Promise<EnrollmentEntity | null>;
 }

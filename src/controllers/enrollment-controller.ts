@@ -59,4 +59,16 @@ export class EnrollmentController {
       return handleError(error);
     }
   }
+
+  async getUserCoursesWithProgress(userId: string) {
+    try {
+      const enrollments =
+        await this.enrollmentUseCase.getUserCoursesWithProgress(userId);
+
+      return handleSuccess(enrollments);
+    } catch (error) {
+      console.error("Erro ao comprar curso:", error);
+      return handleError(error);
+    }
+  }
 }
