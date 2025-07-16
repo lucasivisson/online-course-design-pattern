@@ -71,7 +71,7 @@ export const validationError = (message: string = "Validation failed") => {
 
 export const handleError = (error: Error | unknown) => {
   if (error instanceof HttpError) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ message: error.message }), {
       status: error.status,
       headers: {
         "Content-Type": "application/json",

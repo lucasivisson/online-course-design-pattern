@@ -28,6 +28,7 @@ export class EnrollmentUseCase {
 
     const enrollment = await this.enrollmentRepository.getBy({
       studentId: userId,
+      courseId,
     });
 
     if (enrollment) {

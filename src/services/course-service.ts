@@ -1,5 +1,7 @@
 import { CourseEntity } from "@/entities/course-entity";
 import { api } from "@/config/api";
+import { EnrollmentEntity } from "@/entities/enrollment-entity";
+import { InputBuyCourseDto } from "@/business/dto/enrollment/enrollment-dto";
 
 export class CourseService {
   static async getCourses(): Promise<CourseEntity[]> {
@@ -20,5 +22,16 @@ export class CourseService {
       console.error("Error fetching course:", error);
       throw new Error("Failed to fetch course");
     }
+  }
+
+  static async buyCourse(
+    id: string,
+    data: InputBuyCourseDto
+  ): Promise<EnrollmentEntity> {
+    const response = await api.post<EnrollmentEntity>(
+      `/api/enrollment/${id}`,
+      data
+    );
+    return response;
   }
 }
