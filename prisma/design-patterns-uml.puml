@@ -1,0 +1,262 @@
+@startuml Design Patterns UML
+
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam classBackgroundColor #F8F9FA
+skinparam classBorderColor #6C757D
+skinparam arrowColor #495057
+
+' Repository Pattern
+package "Repository Pattern" {
+  interface IUserRepository {
+    +create(data: User): Promise<UserEntity>
+    +list(): Promise<User[]>
+    +getBy(input: InputFindBy): Promise<User | null>
+    +update(input: InputUpdateFields): Promise<UserEntity>
+  }
+  
+  class PrismaUserRepository {
+    +create(data: User): Promise<UserEntity>
+    +list(): Promise<User[]>
+    +getBy(input: InputFindBy): Promise<User | null>
+    +update(input: InputUpdateFields): Promise<UserEntity>
+  }
+  
+  interface ICourseRepository {
+    +create(input: InputCreateCourseDto): Promise<CourseEntity>
+    +list(): Promise<CourseEntity[]>
+    +get(input: InputGetCourseDto): Promise<CourseEntity | null>
+    +update(input: InputUpdateCourseDto): Promise<CourseEntity>
+    +delete(input: InputDeleteCourseDto): Promise<void>
+  }
+  
+  class PrismaCourseRepository {
+    +create(input: InputCreateCourseDto): Promise<CourseEntity>
+    +list(): Promise<CourseEntity[]>
+    +get(input: InputGetCourseDto): Promise<CourseEntity | null>
+    +update(input: InputUpdateCourseDto): Promise<CourseEntity>
+    +delete(input: InputDeleteCourseDto): Promise<void>
+  }
+  
+  IUserRepository <|.. PrismaUserRepository
+  ICourseRepository <|.. PrismaCourseRepository
+}
+
+' Strategy Pattern
+package "Strategy Pattern" {
+  interface PaymentStrategy {
+    +calculateFinalPrice(basePrice: number): number
+    +getPaymentMethod(): string
+    +getDiscountPercentage(): number
+    +getInstallments(): number | null
+  }
+  
+  class CreditCardStrategy {
+    +calculateFinalPrice(basePrice: number): number
+    +getPaymentMethod(): string
+    +getDiscountPercentage(): number
+    +getInstallments(): number | null
+  }
+  
+  class PixStrategy {
+    +calculateFinalPrice(basePrice: number): number
+    +getPaymentMethod(): string
+    +getDiscountPercentage(): number
+    +getInstallments(): number | null
+  }
+  
+  class BankSlipStrategy {
+    +calculateFinalPrice(basePrice: number): number
+    +getPaymentMethod(): string
+    +getDiscountPercentage(): number
+    +getInstallments(): number | null
+  }
+  
+  class PaymentStrategyFactory {
+    +{static} createStrategy(paymentMethod: string, installments?: number): PaymentStrategy
+  }
+  
+  PaymentStrategy <|.. CreditCardStrategy
+  PaymentStrategy <|.. PixStrategy
+  PaymentStrategy <|.. BankSlipStrategy
+  PaymentStrategyFactory ..> PaymentStrategy : creates
+}
+
+' Observer Pattern
+package "Observer Pattern" {
+  interface INotificationObserver {
+    +attach(userIds: string[]): Promise<void>
+    +detach(userId: string): void
+    +notify(message: string, senderId: string): Promise<NotificationEntity | void>
+  }
+  
+  class NotificationObserver {
+    -observers: string[]
+    -courseId: string
+    -userRepository: IUserRepository
+    -courseRepository: ICourseRepository
+    -notificationRepository: INotificationRepository
+    +attach(userIds: string[]): Promise<void>
+    +detach(userId: string): void
+    +notify(message: string, senderId: string): Promise<NotificationEntity | void>
+    +refreshObservers(): Promise<void>
+  }
+  
+  INotificationObserver <|.. NotificationObserver
+}
+
+' Mediator Pattern
+package "Mediator Pattern" {
+  interface Mediator {
+    +notify(sender: BaseComponent, event: string, payload?: any): Promise<void>
+  }
+  
+  abstract class BaseComponent {
+    #mediator: Mediator | undefined
+    +setMediator(mediator: Mediator): void
+  }
+  
+  class CourseMediator {
+    -courseId: string
+    -postCreatorComponent: PostCreatorComponent
+    -addThreadComponent: AddThreadComponent
+    +userRepository: IUserRepository
+    +postRepository: IPostRepository
+    +courseRepository: ICourseRepository
+    +notify(sender: BaseComponent, event: string, payload?: any): Promise<void>
+  }
+  
+  class PostCreatorComponent {
+    +createPost(params): Promise<void>
+  }
+  
+  class AddThreadComponent {
+    +addThread(params): Promise<void>
+  }
+  
+  Mediator <|.. CourseMediator
+  BaseComponent <|-- PostCreatorComponent
+  BaseComponent <|-- AddThreadComponent
+  CourseMediator --> PostCreatorComponent : coordinates
+  CourseMediator --> AddThreadComponent : coordinates
+}
+
+' Prototype Pattern
+package "Prototype Pattern" {
+  interface Cloneable<T> {
+    +clone(): T
+  }
+  
+  class ModulePrototype {
+    -module: ModuleEntity
+    +clone(newName?: string): ModulePrototype
+    +getClonedModule(): ModuleEntity
+    -convertClassType(type: PrismaClassType): DtoClassType
+  }
+  
+  class ModulePrototypeFactory {
+    +{static} create(module: ModuleEntity): ModulePrototype
+  }
+  
+  Cloneable <|.. ModulePrototype
+  ModulePrototypeFactory ..> ModulePrototype : creates
+}
+
+' Chain of Responsibility Pattern
+package "Chain of Responsibility" {
+  abstract class ProgressHandler {
+    #nextHandler: ProgressHandler | null
+    +setNext(handler: ProgressHandler): ProgressHandler
+    +{abstract} canAccess(enrollment: EnrollmentEntity, targetId: string): boolean
+    +{abstract} getType(): string
+  }
+  
+  class ClassAccessHandler {
+    -courseModules: ModuleEntity[]
+    -targetClassId: string
+    +canAccess(enrollment: EnrollmentEntity, targetId: string): boolean
+    +getType(): string
+  }
+  
+  class ModuleAccessHandler {
+    -courseModules: ModuleEntity[]
+    -targetModuleId: string
+    +canAccess(enrollment: EnrollmentEntity, targetId: string): boolean
+    +getType(): string
+  }
+  
+  class CourseCompletionHandler {
+    -courseModules: ModuleEntity[]
+    +canAccess(enrollment: EnrollmentEntity, targetId: string): boolean
+    +getType(): string
+  }
+  
+  class ProgressChainBuilder {
+    -handlers: ProgressHandler[]
+    +addClassHandler(courseModules: ModuleEntity[], classId: string): ProgressChainBuilder
+    +addModuleHandler(courseModules: ModuleEntity[], moduleId: string): ProgressChainBuilder
+    +addCourseCompletionHandler(courseModules: ModuleEntity[]): ProgressChainBuilder
+    +build(): ProgressHandler | null
+  }
+  
+  class ProgressService {
+    -courseModules: ModuleEntity[]
+    +canAccessClass(enrollment: EnrollmentEntity, classId: string): boolean
+    +canAccessModule(enrollment: EnrollmentEntity, moduleId: string): boolean
+    +getNextAvailableClass(enrollment: EnrollmentEntity): string | null
+    +getNextAvailableModule(enrollment: EnrollmentEntity): string | null
+  }
+  
+  ProgressHandler <|-- ClassAccessHandler
+  ProgressHandler <|-- ModuleAccessHandler
+  ProgressHandler <|-- CourseCompletionHandler
+  ProgressChainBuilder ..> ProgressHandler : builds
+  ProgressService ..> ProgressHandler : uses
+}
+
+' Use Case Pattern
+package "Use Case Pattern" {
+  class CourseUseCase {
+    -courseRepository: ICourseRepository
+    -userRepository: IUserRepository
+    +list(): Promise<OutputListCourseDto>
+    +create(data: InputCreateCourseDto): Promise<OutputCreateCourseDto>
+    +get(data: InputGetCourseDto): Promise<OutputGetCourseDto>
+    +update(data: InputUpdateCourseDto): Promise<OutputUpdateCourseDto>
+    +delete(data: InputDeleteCourseDto): Promise<OutputDeleteCourseDto>
+  }
+  
+  class EnrollmentUseCase {
+    -enrollmentRepository: IEnrollmentRepository
+    -courseRepository: ICourseRepository
+    +buyCourse(courseId: string, userId: string, data: InputBuyCourseDto): Promise<OutputBuyCourseDto>
+  }
+  
+  class PostUseCase {
+    -postRepository: IPostRepository
+    +createPost(data: InputCreatePostDto): Promise<OutputCreatePostDto>
+    +addThreadToPost(data: InputAddThreadToPostDto): Promise<void>
+    +listPosts(data: InputListPostsDto): Promise<OutputListPostsDto>
+    +deletePost(data: InputDeletePostDto): Promise<OutputDeletePostDto>
+  }
+}
+
+' Singleton Pattern (Global Instances)
+package "Singleton Pattern" {
+  class GlobalInstances {
+    +courseMediatorsGlobal: { [courseId: string]: CourseMediator }
+    +courseNotificationSubjectsGlobal: { [courseId: string]: NotificationObserver }
+    +prisma: PrismaClient (global instance)
+  }
+}
+
+' Relationships between patterns
+CourseUseCase --> ICourseRepository : uses
+EnrollmentUseCase --> PaymentStrategyFactory : uses
+EnrollmentUseCase --> ProgressService : uses
+PostUseCase --> CourseMediator : uses
+CourseMediator --> NotificationObserver : uses
+ModulePrototypeFactory --> ModulePrototype : creates
+ProgressChainBuilder --> ProgressHandler : builds
+
+@enduml 

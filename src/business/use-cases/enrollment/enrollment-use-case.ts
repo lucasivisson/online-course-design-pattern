@@ -8,6 +8,7 @@ import { notFoundError } from "@/shared/http-handler";
 import { validationError } from "@/shared/http-handler";
 import { PaymentStrategyFactory } from "@/business/strategies/payment-strategy";
 import { ProgressService } from "@/business/chain/progress-handler";
+import { EnrollmentEntity } from "@/entities/enrollment-entity";
 
 export class EnrollmentUseCase {
   constructor(
@@ -28,6 +29,7 @@ export class EnrollmentUseCase {
 
     const enrollment = await this.enrollmentRepository.getBy({
       studentId: userId,
+      courseId,
     });
 
     if (enrollment) {
@@ -109,5 +111,15 @@ export class EnrollmentUseCase {
         ? [...enrollment.finishedModulesIds, foundModuleWithClass.id]
         : enrollment.finishedModulesIds,
     });
+  }
+
+  async getUserCoursesWithProgress(
+    userId: string
+  ): Promise<EnrollmentEntity[]> {
+    const enrollments = await this.enrollmentRepository.listByUserId(userId);
+
+    if (!enrollments?.length) return [];
+
+    return enrollments;
   }
 }

@@ -67,7 +67,7 @@ export const api = {
 
   post: <TResponse, TRequest = unknown>(
     url: string,
-    data: TRequest,
+    data?: TRequest,
     options?: RequestOptions
   ) => request<TResponse, TRequest>("POST", url, data, options),
 

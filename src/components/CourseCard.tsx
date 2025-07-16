@@ -26,10 +26,7 @@ export function CourseCard({ index, course, onClick }: CourseCardProps) {
   };
 
   return (
-    <div
-      className="bg-white overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 cursor-pointer border border-gray-200"
-      onClick={onClick}
-    >
+    <div className="bg-white overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 cursor-pointer border border-gray-200">
       <div
         className={cn(
           getRandomBackgroundColorBasedOnIndex(index),
@@ -71,13 +68,15 @@ export function CourseCard({ index, course, onClick }: CourseCardProps) {
         </div>
 
         <div className="mt-4 pt-4 border-t border-gray-100">
-          <div className="flex items-center justify-between text-xs text-gray-400">
+          <div className="max-xl:flex-col max-xl:gap-4 flex items-center justify-between text-xs text-gray-400">
             <span>
-              <span className="text-3xl font-bold text-green-600">
+              <span className="max-xl:text-3xl text-xl font-bold text-green-600">
                 R$ {course.price.toFixed(2)}
               </span>
             </span>
-            <Button variant="blue">Inscrever-se</Button>
+            <Button onClick={onClick} variant="blue" className="max-xl:w-full">
+              Inscrever-se
+            </Button>
           </div>
         </div>
       </div>

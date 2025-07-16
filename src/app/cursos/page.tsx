@@ -1,9 +1,9 @@
 import { CourseEntity } from "@/entities/course-entity";
-import { CourseCard } from "@/components/CourseCard";
 import { CourseService } from "@/services/course-service";
 import { Button } from "@/components/ui/button";
 import { Stats } from "@/components/ui/stats";
 import ArrowIcon from "@/assets/arrow.svg";
+import BuyableCoursesSection from "@/app/cursos/BuyableCoursesSection";
 
 export default async function CoursesPage() {
   const courses: CourseEntity[] = await CourseService.getCourses();
@@ -44,19 +44,7 @@ export default async function CoursesPage() {
           </Button>
         </div>
 
-        {courses.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">
-              Nenhum curso disponível no momento.
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {courses.map((course, index) => (
-              <CourseCard index={index} key={index} course={course} />
-            ))}
-          </div>
-        )}
+        <BuyableCoursesSection courses={courses} />
 
         <Stats
           className="mt-10"

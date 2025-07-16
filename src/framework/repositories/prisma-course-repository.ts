@@ -25,13 +25,13 @@ export class PrismaCourseRepository implements ICourseRepository {
             finished: true,
             paymentMethod: true,
             finalPrice: true,
-            student: true,
             finishedClassesIds: true,
             finishedModulesIds: true,
             updatedAt: true,
             createdAt: true,
             courseId: true,
             studentId: true,
+            student: true,
           },
         },
         posts: true,
@@ -113,7 +113,7 @@ export class PrismaCourseRepository implements ICourseRepository {
       return null;
     }
 
-    return await prisma.course.findUnique({
+    return await prisma.course.findFirst({
       where: input as Prisma.CourseWhereUniqueInput,
       include: {
         professor: true,

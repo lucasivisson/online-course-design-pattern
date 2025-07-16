@@ -1,20 +1,29 @@
-import { CourseEntity } from "@/entities/course-entity";
 import { CourseService } from "@/services/course-service";
 import { Button } from "@/components/ui/button";
 import { ProgressCourseCard } from "@/components/ProgressCourseCard";
 import BookIcon from "@/assets/book.svg";
+import { EnrollmentEntity } from "@/entities/enrollment-entity";
 
 export default async function CoursesPage() {
-  const courses: CourseEntity[] = await CourseService.getCourses();
+  const enrollments: EnrollmentEntity[] = await CourseService.getUserCourses();
 
-  if (!courses) {
+  if (!enrollments?.length) {
     return (
-      <div className="min-h-screen bg-white">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-center min-h-[400px]">
+      <div className="h-screen bg-white">
+        <div className="container h-full mx-auto px-4 py-8">
+          <div className="flex flex-col h-full gap-6 items-center justify-center min-h-[400px]">
             <div className="text-red-600">
-              Algo deu errado ao carregar os cursos. Tente novamente mais tarde.
+              Você não possui nenhum curso. Explore nossos cursos disponíveis
+              clicando no botão abaixo.
             </div>
+            <Button
+              href="/cursos"
+              variant="blue"
+              className="flex border-0 items-center gap-2"
+            >
+              <BookIcon className="w-5 h-5 text-white" />
+              <span>Explorar Novos Cursos</span>
+            </Button>
           </div>
         </div>
       </div>
@@ -43,7 +52,7 @@ export default async function CoursesPage() {
           </Button>
         </div>
 
-        {courses.length === 0 ? (
+        {enrollments.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500 text-lg">
               Nenhum curso disponível no momento.
@@ -51,8 +60,12 @@ export default async function CoursesPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {courses.map((course, index) => (
-              <ProgressCourseCard index={index} key={index} course={course} />
+            {enrollments.map((enrollment, index) => (
+              <ProgressCourseCard
+                index={index}
+                key={index}
+                enrollment={enrollment}
+              />
             ))}
           </div>
         )}
