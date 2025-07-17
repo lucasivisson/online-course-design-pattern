@@ -5,7 +5,7 @@ import { PostEntity } from "@/entities/post-entity";
 export type InputCreatePost = { courseId: string, message?: string, file?: File }
 
 export class PostService {
-  static async create(input: InputCreatePost): Promise<unknown> {
+  static async create(input: InputCreatePost): Promise<PostEntity> {
     try {
       const formData = new FormData();
       if (input.message) formData.append("message", input.message);
@@ -17,8 +17,8 @@ export class PostService {
         throw new Error("Any attribute need to be passed");
       }
 
-      await api.post("/api/posts", formData);
-      return {}
+      const response = await api.post<{post: PostEntity}>("/api/posts", formData);
+      return response.post
     } catch (error) {
       console.error("Error fetching courses:", error);
       throw new Error("Failed to create post");
@@ -35,7 +35,7 @@ export class PostService {
     }
   }
 
-  static async addThreadOnPost(input: { postId: string, message?: string, file?: File }): Promise<unknown> {
+  static async addThreadOnPost(input: { postId: string, message?: string, file?: File }): Promise<PostEntity> {
     try {
       const formData = new FormData();
       if (input.message) formData.append("message", input.message);
@@ -45,8 +45,8 @@ export class PostService {
       if(!input.message && !input.file) {
         throw new Error("Any attribute need to be passed");
       }
-      await api.patch(`/api/posts/${input.postId}`, formData);
-      return {}
+      const response = await api.patch<{ post: PostEntity }>(`/api/posts/${input.postId}`, formData);
+      return response.post
     } catch (error) {
       console.error("Error fetching course:", error);
       throw new Error("Failed to add thread on post");

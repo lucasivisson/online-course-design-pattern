@@ -7,7 +7,7 @@ export type InputCreateUpdatePost = {
   authorId: string,
   authorName: string,
   file: FileEntity | null
-  thread: { authorId: string, authorName: string, message: string | null, file: {
+  thread: { authorId: string, authorName: string, message: string | null, createdAt: Date, file: {
     fileName: string;
     type: string;
     url: string;
@@ -27,6 +27,10 @@ export type InputDeletePostById = {
   postId: string
 }
 
+export type InputGetPostBy = Partial<
+  Omit<PostEntity, "createdAt" | "updatedAt" | "thread" | "file">
+>;
+
 export type InputFindManyByCourseId = {
   courseId: string
 }
@@ -35,6 +39,7 @@ export interface IPostRepository {
   create(input: InputCreateUpdatePost): Promise<PostEntity>
   update(input: InputUpdatePost): Promise<PostEntity>
   findById(input: InputFindPostById): Promise<PostEntity | null>
+  getBy(input: InputGetPostBy): Promise<PostEntity | null>
   delete(input: InputDeletePostById): Promise<void>
   findManyByCourseId(input: InputFindManyByCourseId): Promise<PostEntity[]>
 }

@@ -65,10 +65,10 @@ export class PostController {
 
       if (errors.length > 0) return errorHandler(errors);
 
-      await this.postUseCase.create(input);
+      const post = await this.postUseCase.create(input);
 
-      return new Response(null, {
-        status: 204,
+      return new Response(JSON.stringify({ post }), {
+        status: 201,
         headers: {
           "Content-Type": "application/json",
         },
@@ -105,10 +105,10 @@ export class PostController {
 
       if (errors.length > 0) return errorHandler(errors);
 
-      await this.postUseCase.addThreadOnPost(input);
+      const post = await this.postUseCase.addThreadOnPost(input);
 
-      return new Response(null, {
-        status: 204,
+      return new Response(JSON.stringify({ post }), {
+        status: 200,
         headers: {
           "Content-Type": "application/json",
         },

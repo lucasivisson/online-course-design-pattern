@@ -9,6 +9,9 @@ interface UsePostsResult {
   loading: boolean;
   error: string | null;
   refetchPosts: () => void; // Função para recarregar os posts
+  handleAddPost: (post: PostEntity) => void;
+  handleUpdatePost: (post: PostEntity) => void;
+  handleDeletePost: (id: string) => void;
 }
 
 interface TransformedComment {
@@ -21,9 +24,11 @@ interface TransformedComment {
 export interface TransformedPost {
   id: string;
   author: string;
+  authorId: string;
   time: string; // Pode ser Date ou string formatada
   content: string | null;
   comments: TransformedComment[];
+  file: FileEntity | null;
   rawPost: PostEntity; // Manter a entidade original, se necessário
 }
 
@@ -57,12 +62,13 @@ export const usePosts = (courseId: string): UsePostsResult => {
       const fetchedPosts = await PostService.index({ courseId });
       const transformedPosts: TransformedPost[] = fetchedPosts.map((post) => ({
         id: post.id,
-        author: "Emerson Lucena", // Usa nome mapeado ou o ID
+        author: post.authorName, // Usa nome mapeado ou o ID
+        authorId: post.authorId,
         time: formatTime(new Date(post.createdAt)), // Formata a data de criação do post
         content: post.message,
         file: post.file,
         comments: post.thread.map((threadItem) => ({
-          author: "Lucas Ivisson",
+          author: threadItem.authorName,
           time: formatTime(new Date(threadItem.createdAt)), // Formata a data de criação do comentário
           text: threadItem.message,
           file: threadItem.file,
@@ -82,11 +88,68 @@ export const usePosts = (courseId: string): UsePostsResult => {
     fetchPosts();
   }, [fetchPosts]); // Chama fetchPosts quando o hook é montado ou fetchPosts muda
 
+  const handleAddPost = (post: PostEntity) => {
+    setPosts((prevState) => [
+      {
+        id: post.id,
+        author: post.authorName, // Usa nome mapeado ou o ID
+        authorId: post.authorId,
+        time: formatTime(new Date(post.createdAt)), // Formata a data de criação do post
+        content: post.message,
+        file: post.file,
+        comments: post.thread.map((threadItem) => ({
+          author: threadItem.authorName,
+          time: formatTime(new Date(threadItem.createdAt)), // Formata a data de criação do comentário
+          text: threadItem.message,
+          file: threadItem.file,
+        })),
+        rawPost: post, // Guarda a postagem original se precisar
+      },
+      ...prevState,
+    ]);
+  };
+
+  const handleUpdatePost = (post: PostEntity) => {
+    setPosts((prevState) =>
+      prevState.map((p) =>
+        p.id === post.id
+          ? {
+              id: post.id,
+              author: post.authorName,
+              authorId: post.authorId,
+              time: formatTime(new Date(post.createdAt)),
+              content: post.message,
+              file: post.file,
+              comments: post.thread.map((threadItem) => ({
+                author: threadItem.authorName,
+                time: formatTime(new Date(threadItem.createdAt)),
+                text: threadItem.message,
+                file: threadItem.file,
+              })),
+              rawPost: post,
+            }
+          : p
+      )
+    );
+  };
+
+  const handleDeletePost = (id: string) => {
+    setPosts((prevState) => prevState.filter((p) => p.id !== id));
+  };
+
   // Função para recarregar os posts manualmente
   const refetchPosts = () => {
     console.log("executou aq?");
     fetchPosts();
   };
 
-  return { posts, loading, error, refetchPosts };
+  return {
+    posts,
+    loading,
+    error,
+    refetchPosts,
+    handleAddPost,
+    handleUpdatePost,
+    handleDeletePost,
+  };
 };

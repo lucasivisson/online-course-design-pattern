@@ -1,6 +1,7 @@
 import { FileEntity } from "@/entities/file-entity";
 import { Mediator } from "./mediator-interface";
 import { BaseComponent } from "./mediator-interface";
+import { PostEntity } from "@/entities/post-entity";
 
 type FileInput = Omit<FileEntity, "url"> & {
   fileBuffer: Uint8Array
@@ -15,12 +16,13 @@ class PostCreatorComponent extends BaseComponent {
       super(mediator);
     }
 
-    public async createPost({authorId, courseId, message, file}: { authorId: string, courseId: string, message?: string, file?: FileInput }): Promise<void> {
+    public async createPost({authorId, courseId, message, file}: { authorId: string, courseId: string, message?: string, file?: FileInput }): Promise<PostEntity | undefined> {
       if (!this.mediator) {
         throw new Error('Mediator not set for PostCreatorComponent.');
       }
       console.log(`PostCreatorComponent: Iniciando criação de post para curso ${courseId}.`);
-      await this.mediator.notify(this, 'createPost', { authorId, courseId, message, file });
+      const post = await this.mediator.notify(this, 'createPost', { authorId, courseId, message, file });
+      return post
     }
 }
 
@@ -33,12 +35,13 @@ class AddThreadComponent extends BaseComponent {
       super(mediator);
     }
 
-    public async addThread({ postId, authorId, courseId, message, file }: {postId: string, authorId: string, courseId: string, message?: string, file?: FileInput}): Promise<void> {
+    public async addThread({ postId, authorId, courseId, message, file }: {postId: string, authorId: string, courseId: string, message?: string, file?: FileInput}): Promise<PostEntity | undefined> {
       if (!this.mediator) {
         throw new Error('Mediator not set for ThreadAdderComponent.');
       }
       console.log(`ThreadAdderComponent: Iniciando adição de thread ao post ${postId}.`);
-      await this.mediator.notify(this, 'addThread', { postId, authorId, courseId, message, file });
+      const post = await this.mediator.notify(this, 'addThread', { postId, authorId, courseId, message, file });
+      return post
     }
 }
 

@@ -12,21 +12,23 @@ export class PostUseCase {
     const postCreatorComponent = mediator.getPostCreatorComponent();
     postCreatorComponent.setMediator(mediator)
     // verify if user is on the course or not to create a post later
-    await postCreatorComponent.createPost({ ...input })
+    const post = await postCreatorComponent.createPost({ ...input })
+    return post
   }
 
   async addThreadOnPost(input: InputAddThreadToPostDto): Promise<OutputCreatePostDto> {
     // verify if user is on the course or not to create a thread on post later
-    const post = await this.postRepository.findById({ postId: input.postId })
-    if(!post) {
+    const postFounded = await this.postRepository.findById({ postId: input.postId })
+    if(!postFounded) {
       throw new Error(JSON.stringify(PostNotFound))
     }
 
-    const mediator = getCourseMediator(post.courseId);
+    const mediator = getCourseMediator(postFounded.courseId);
     const addThreadComponent = mediator.getAddThreadComponent();
     addThreadComponent.setMediator(mediator)
 
-    await addThreadComponent.addThread({ authorId: input.userId, courseId: post.courseId, postId: input.postId, file: input.thread.file, message: input.thread.message })
+    const post = await addThreadComponent.addThread({ authorId: input.userId, courseId: postFounded.courseId, postId: input.postId, file: input.thread.file, message: input.thread.message })
+    return post
   }
 
   async delete(input: InputDeletePostDto): Promise<OutputDeletePostDto> {

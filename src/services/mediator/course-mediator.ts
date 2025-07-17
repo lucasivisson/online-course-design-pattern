@@ -85,7 +85,10 @@ class CourseMediator implements Mediator {
         const postContentSummary = message ? message : 'um arquivo em anexo.';
         const notificationMessage = `${author.name} postou "${postContentSummary}" no curso "${course.name}"!`;
         console.log(`Mediator: Post ${postCreated.id} criado e notificação disparada.`);
-        await notificationObserver.notify(notificationMessage, authorId, authorId);
+        const notification = await notificationObserver.notify(notificationMessage, authorId, authorId);
+        console.log('notification disparada', notification?.id)
+        console.log('postCreated', postCreated)
+        console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', postCreated)
         return postCreated
       }
     }
@@ -97,7 +100,7 @@ class CourseMediator implements Mediator {
         throw new Error('Uma resposta (thread) deve ter uma mensagem ou um arquivo.');
       }
 
-      const post = await this.postRepository.findById({ postId });
+      const post = await this.postRepository.getBy({ id: postId });
       // select: { courseId: true, authorId: true }
 
       if (!post) {
@@ -138,8 +141,10 @@ class CourseMediator implements Mediator {
 
         const threadContentSummary = message ? message : 'um arquivo anexo.';
         const notificationMessage = `${author.name} respondeu "${threadContentSummary}" em um post no curso "${course.name}"!`;
-        await notificationObserver.notify(notificationMessage, authorId, authorId);
+        const notification = await notificationObserver.notify(notificationMessage, authorId, authorId);
+                console.log('notification disparada', notification?.id)
         console.log(`Mediator: Thread adicionada ao post ${postId} e notificação disparada.`);
+        console.log('postCreated', postCreated)
         return postCreated
         // Se precisar de notificação específica para o autor do post, pode ser feito aqui
         // Ex: if (authorId !== post.authorId && post.authorId) { /* Lógica de notificação direta */ }

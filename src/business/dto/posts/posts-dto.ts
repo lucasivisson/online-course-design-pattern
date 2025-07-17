@@ -33,7 +33,7 @@ export class InputCreatePostDto {
   file: File
 }
 
-export type OutputCreatePostDto = void
+export type OutputCreatePostDto = PostEntity | undefined
 
 export class InputDeletePostDto {
   @IsString()

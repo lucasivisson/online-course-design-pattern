@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Trash2, Upload } from "lucide-react";
 import React, { useRef, useState } from "react";
 
@@ -6,10 +7,12 @@ export const CreateComment = ({
   placeholder,
   onPublish,
   profileInitial = "U",
+  textButton = "Publicar",
 }: {
   placeholder: string;
   onPublish: (message?: string, file?: File) => void;
   profileInitial?: string;
+  textButton?: string;
 }) => {
   const [message, setMessage] = useState<string | undefined>(undefined);
   const [document, setDocument] = useState<File | undefined>(undefined);
@@ -23,6 +26,8 @@ export const CreateComment = ({
       }
     }
   };
+
+  console.log("message", message);
 
   const handleRemoveDocument = () => {
     setDocument(undefined);
@@ -44,9 +49,15 @@ export const CreateComment = ({
   };
 
   const handlePublishClick = () => {
-    onPublish(message, document); // Passa a mensagem e o documento
-    setMessage(undefined); // Limpa a mensagem
-    handleRemoveDocument(); // Remove o documento após a publicação
+    try {
+      onPublish(message, document); // Passa a mensagem e o documento
+      setMessage(undefined); // Limpa a mensagem
+      handleRemoveDocument(); // Remove o documento após a publicação
+      setDocument(undefined);
+      setMessage("");
+    } catch (err) {
+      console.log("ocorreu um erro");
+    }
   };
 
   return (
@@ -124,7 +135,7 @@ export const CreateComment = ({
             onClick={handlePublishClick}
             disabled={!message && !document}
           >
-            Publicar
+            {textButton}
           </button>
         </div>
       </div>
