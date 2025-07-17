@@ -3,7 +3,7 @@ import { CourseService } from "@/services/course-service";
 import { Button } from "@/components/ui/button";
 import { Stats } from "@/components/ui/stats";
 import ArrowIcon from "@/assets/arrow.svg";
-import BuyableCoursesSection from "@/app/cursos/BuyableCoursesSection";
+import BuyableCoursesSection from "@/app/(shared)/cursos/BuyableCoursesSection";
 
 export default async function CoursesPage() {
   const courses: CourseEntity[] = await CourseService.getCourses();

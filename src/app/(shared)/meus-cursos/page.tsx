@@ -1,11 +1,52 @@
+"use client";
+
 import { CourseService } from "@/services/course-service";
 import { Button } from "@/components/ui/button";
 import { ProgressCourseCard } from "@/components/ProgressCourseCard";
 import BookIcon from "@/assets/book.svg";
 import { EnrollmentEntity } from "@/entities/enrollment-entity";
+import { useAuth } from "@/context/AuthContext";
+import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
+import { FaSpinner } from "react-icons/fa";
 
-export default async function CoursesPage() {
-  const enrollments: EnrollmentEntity[] = await CourseService.getUserCourses();
+export default function CoursesPage() {
+  const { userId } = useAuth();
+  const [enrollments, setEnrollments] = useState<EnrollmentEntity[]>();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!userId) {
+      return redirect("/login");
+    }
+
+    const fetchEnrollments = async () => {
+      try {
+        const data = await CourseService.getUserCourses(userId);
+        setEnrollments(data);
+      } catch (error) {
+        console.error("Error fetching enrollments:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEnrollments();
+  }, [userId]);
+
+  if (!userId) {
+    return redirect("/login");
+  }
+
+  if (loading) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <div className="flex justify-center items-center h-64">
+          <FaSpinner className="animate-spin text-4xl text-blue-600" />
+        </div>
+      </div>
+    );
+  }
 
   if (!enrollments?.length) {
     return (

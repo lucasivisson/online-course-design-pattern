@@ -1,14 +1,23 @@
 "use client";
+
 import { useAuth } from "@/context/AuthContext";
 import { TEACHER_ID, USER_ID } from "@/shared/constants";
 import { GraduationCap, BookOpen } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export default function LandingPage() {
   const { login } = useAuth();
+  const router = useRouter();
 
   const handleLogin = (type: string) => {
     login(type === "teacher" ? TEACHER_ID : USER_ID);
-    // redirecionar para a dash do usuário ou teacher
+
+    if (type === "teacher") {
+      router.push("/dashboard");
+    } else {
+      router.push("/cursos");
+    }
   };
 
   return (
@@ -24,21 +33,21 @@ export default function LandingPage() {
 
         {/* Main Buttons */}
         <div className="space-y-4">
-          <div
+          <Button
             onClick={() => handleLogin("teacher")}
             className="w-full flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
           >
             <BookOpen className="w-6 h-6" />
             <span className="text-lg">Entrar como Professor</span>
-          </div>
+          </Button>
 
-          <div
+          <Button
             onClick={() => handleLogin("student")}
             className="w-full flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 text-white font-semibold py-4 px-6 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
           >
             <GraduationCap className="w-6 h-6" />
             <span className="text-lg">Entrar como Aluno</span>
-          </div>
+          </Button>
         </div>
 
         {/* Login Button */}

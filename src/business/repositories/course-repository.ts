@@ -21,4 +21,5 @@ export interface ICourseRepository {
   delete(input: InputDeleteCourseDto): Promise<void>;
   getBy(input: InputGetCourseBy): Promise<CourseEntity | null>;
   getById(id: string): Promise<CourseEntity | null>;
+  listCoursesFromTeacherId(id: string): Promise<CourseEntity[]>;
 }

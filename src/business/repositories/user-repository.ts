@@ -12,6 +12,6 @@ export interface IUserRepository {
   create(input: InputCreateUserDto): Promise<UserEntity>;
   list(): Promise<UserEntity[]>;
   getBy(input: InputFindBy): Promise<UserEntity | null>;
-  getManyById(input: InputGetManyById): Promise<UserEntity[]>
+  getManyById(input: InputGetManyById): Promise<UserEntity[]>;
   update(input: InputUpdateFields): Promise<UserEntity>;
 }

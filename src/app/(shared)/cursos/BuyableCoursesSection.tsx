@@ -8,6 +8,8 @@ import toast from "react-hot-toast";
 import { XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PaymentMethod } from "@/entities/enrollment-entity";
+import { useAuth } from "@/context/AuthContext";
+import { redirect } from "next/navigation";
 
 interface BuyableCoursesSectionProps {
   courses: CourseEntity[];
@@ -32,6 +34,12 @@ export default function BuyableCoursesSection({
   );
   const [loading, setLoading] = useState(false);
 
+  const { userId } = useAuth();
+
+  if (!userId) {
+    return redirect("/login");
+  }
+
   const openModal = (course: CourseEntity) => {
     setSelectedCourse(course);
     setPaymentMethod(PAYMENT_METHODS[0].value);
@@ -48,10 +56,14 @@ export default function BuyableCoursesSection({
     if (!selectedCourse) return;
     setLoading(true);
     try {
-      const creatingPromise = CourseService.buyCourse(selectedCourse.id, {
-        paymentMethod,
-        installments,
-      });
+      const creatingPromise = CourseService.buyCourse(
+        selectedCourse.id,
+        userId,
+        {
+          paymentMethod,
+          installments,
+        }
+      );
       toast.promise(creatingPromise, {
         loading: "Comprando curso...",
         success: () => {

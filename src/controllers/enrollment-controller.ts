@@ -4,7 +4,6 @@ import { NextRequest } from "next/server";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
 import { errorHandler, handleSuccess } from "@/shared/http-handler";
-import { USER_ID } from "@/shared/constants";
 import { EnrollmentUseCase } from "@/business/use-cases/enrollment/enrollment-use-case";
 import { PrismaCourseRepository } from "@/framework/repositories/prisma-course-repository";
 import { handleError } from "@/shared/http-handler";
@@ -21,12 +20,23 @@ export class EnrollmentController {
 
   async buyCourse(req: NextRequest, courseId: string) {
     try {
-      const userId = USER_ID;
+      const userId = req.nextUrl.searchParams.get("userId");
+
+      if (!userId) {
+        return errorHandler([
+          {
+            property: "userId",
+            constraints: {
+              isNotEmpty: "userId é necessário",
+            },
+          },
+        ]);
+      }
+
       const data = await req.json();
 
       const dto = plainToInstance(InputBuyCourseDto, data);
       const errors = await validate(dto);
-      console.log("test");
 
       if (errors.length > 0) return errorHandler(errors);
 
@@ -45,7 +55,18 @@ export class EnrollmentController {
 
   async completeClass(req: NextRequest, courseId: string, classId: string) {
     try {
-      const userId = USER_ID;
+      const userId = req.nextUrl.searchParams.get("userId");
+
+      if (!userId) {
+        return errorHandler([
+          {
+            property: "userId",
+            constraints: {
+              isNotEmpty: "userId é necessário",
+            },
+          },
+        ]);
+      }
 
       const userCreated = await this.enrollmentUseCase.completeClass(
         courseId,
@@ -60,8 +81,21 @@ export class EnrollmentController {
     }
   }
 
-  async getUserCoursesWithProgress(userId: string) {
+  async getUserCoursesWithProgress(req: NextRequest) {
     try {
+      const userId = req.nextUrl.searchParams.get("userId");
+
+      if (!userId) {
+        return errorHandler([
+          {
+            property: "userId",
+            constraints: {
+              isNotEmpty: "userId é necessário",
+            },
+          },
+        ]);
+      }
+
       const enrollments =
         await this.enrollmentUseCase.getUserCoursesWithProgress(userId);
 
