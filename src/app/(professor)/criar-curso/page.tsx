@@ -64,7 +64,7 @@ export default function CreateCoursePage() {
       toast.promise(creatingPromise, {
         loading: "Criando curso...",
         success: () => {
-          setTimeout(() => router.push("/dashboard/courses"), 1000); // substituir pelo caminho correto
+          setTimeout(() => router.push("/dashboard"), 1000); // substituir pelo caminho correto
           return "Curso criado com sucesso!";
         },
         error: (err) => {

@@ -25,9 +25,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={interSans.className}>
       <AuthProvider>
-        <Navbar />
-        <Toaster position="top-right" />
-        <body className={`antialiased bg-[white!important]`}>{children}</body>
+        <body className={`antialiased bg-[white!important]`}>
+          <Navbar />
+          <Toaster position="top-right" />
+          {children}
+        </body>
       </AuthProvider>
     </html>
   );

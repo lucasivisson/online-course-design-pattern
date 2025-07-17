@@ -61,4 +61,19 @@ export class CourseService {
     );
     return response.data;
   }
+
+  static async completeLesson({
+    courseId,
+    lessonId,
+    userId,
+  }: {
+    courseId: string;
+    lessonId: string;
+    userId: string;
+  }): Promise<EnrollmentEntity> {
+    const response = await api.post<{ data: EnrollmentEntity }>(
+      `/api/enrollment/${courseId}/${lessonId}?userId=${userId}`
+    );
+    return response.data;
+  }
 }

@@ -8,19 +8,15 @@ import { Button } from "@/components/ui/button";
 
 interface NavbarProps {
   showBackButton?: boolean;
-  showCreateCourse?: boolean;
   notificationCount?: number;
   userName?: string;
   userEmail?: string;
 }
 
-export function Navbar({
-  showBackButton = false,
-  showCreateCourse = false,
-}: NavbarProps) {
+export function Navbar({ showBackButton = false }: NavbarProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { userId } = useAuth();
+  const { userId, isTeacher } = useAuth();
 
   if (pathname.startsWith("/login")) {
     return null;
@@ -66,13 +62,8 @@ export function Navbar({
           </div>
 
           <div className="flex items-center gap-4">
-            {showCreateCourse && (
-              <button
-                onClick={handleCreateCourse}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-              >
-                + Criar Novo Curso
-              </button>
+            {isTeacher && (
+              <Button onClick={handleCreateCourse}>+ Criar Novo Curso</Button>
             )}
             <div className="relative">
               <Button

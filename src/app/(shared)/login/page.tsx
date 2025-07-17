@@ -16,7 +16,7 @@ export default function LandingPage() {
     if (type === "teacher") {
       router.push("/dashboard");
     } else {
-      router.push("/cursos");
+      router.push("/meus-cursos");
     }
   };
 

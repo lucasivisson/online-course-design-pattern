@@ -1,12 +1,14 @@
 // authContext.ts
 "use client";
 import { createContext, useContext, ReactNode, useState } from "react";
+import { TEACHER_ID } from "../shared/constants";
 
 // Tipos
 type AuthContextType = {
   userId: string | null;
   login: (userId: string) => void;
   isAuthenticated: boolean;
+  isTeacher: boolean;
 };
 
 // Contexto
@@ -23,7 +25,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const isAuthenticated = !!userId;
 
   return (
-    <AuthContext.Provider value={{ userId, login, isAuthenticated }}>
+    <AuthContext.Provider
+      value={{
+        userId,
+        login,
+        isAuthenticated,
+        isTeacher: userId === TEACHER_ID,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

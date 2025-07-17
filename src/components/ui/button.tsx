@@ -6,11 +6,22 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "blue" | "gray-50" | "link";
   size?: "sm" | "md" | "lg";
   href?: string;
+  target?: string;
+  disabled?: boolean;
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
-    { className, variant = "blue", size = "md", children, href, ...props },
+    {
+      className,
+      variant = "blue",
+      size = "md",
+      children,
+      href,
+      target,
+      disabled,
+      ...props
+    },
     ref
   ) => {
     const baseClasses =
@@ -26,7 +37,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const sizes = {
       sm: "px-3 py-1.5 text-sm",
       md: "px-4 py-2 text-md",
-      lg: "px-6 py-3 text-lg",
+      lg: "px-5 py-2 text-lg",
     };
 
     const buttonClasses = cn(
@@ -38,14 +49,23 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     if (href) {
       return (
-        <Link href={href} className={buttonClasses}>
+        <Link target={target} href={href} className={buttonClasses}>
           {children}
         </Link>
       );
     }
 
     return (
-      <button className={buttonClasses} ref={ref} {...props}>
+      <button
+        className={cn(
+          buttonClasses,
+          disabled &&
+            "opacity-50 hover:bg-gray-300 cursor-not-allowed bg-gray-300"
+        )}
+        ref={ref}
+        {...props}
+        disabled={disabled}
+      >
         {children}
       </button>
     );

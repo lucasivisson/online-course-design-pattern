@@ -99,6 +99,7 @@ export default function Dashboard() {
             <ManageCourseCard
               key={course.id}
               title={course.name}
+              modules={course.modules?.length || 0}
               status="Publicado"
               students={course.enrollments?.length || 0}
               lastUpdate={

@@ -109,7 +109,8 @@ export default function BuyableCoursesSection({
         <div className="fixed text-gray-800 inset-0 z-50 flex items-center justify-center bg-black/30 bg-opacity-40">
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
             <Button
-              className="absolute size-6 cursor-pointer top-2 right-2  hover:text-gray-600"
+              variant="link"
+              className="absolute w-fit p-1 cursor-pointer top-2 right-2 text-gray-600  hover:text-gray-800"
               onClick={closeModal}
               disabled={loading}
               aria-label="Fechar"
