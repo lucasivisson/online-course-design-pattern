@@ -54,4 +54,9 @@ export class CourseUseCase {
   async delete(data: InputDeleteCourseDto): Promise<OutputDeleteCourseDto> {
     return await this.courseRepository.delete(data);
   }
+
+  async listCoursesFromTeacher(id: string): Promise<OutputListCourseDto> {
+    const courses = await this.courseRepository.listCoursesFromTeacherId(id);
+    return courses;
+  }
 }

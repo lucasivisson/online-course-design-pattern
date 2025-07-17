@@ -163,4 +163,22 @@ export class PrismaCourseRepository implements ICourseRepository {
       },
     });
   }
+
+  async listCoursesFromTeacherId(id: string): Promise<CourseEntity[]> {
+    const courses = await prisma.course.findMany({
+      where: { professorId: id },
+      include: {
+        professor: true,
+        enrollments: {
+          include: {
+            student: true,
+          },
+        },
+        posts: true,
+        modules: true,
+      },
+    });
+
+    return courses;
+  }
 }

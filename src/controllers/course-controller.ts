@@ -186,4 +186,35 @@ export class CourseController {
       );
     }
   }
+
+  async listTeacherCourses(req: NextRequest) {
+    try {
+      const userId = req.nextUrl.searchParams.get("userId");
+
+      if (!userId) {
+        return errorHandler([
+          {
+            property: "userId",
+            constraints: {
+              isNotEmpty: "userId é necessário",
+            },
+          },
+        ]);
+      }
+
+      const users = await this.courseUseCase.listCoursesFromTeacher(userId);
+
+      return new Response(JSON.stringify({ users }), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    } catch (error) {
+      console.error("Erro ao consultar usuários:", error);
+      throw new Error(
+        error instanceof Error ? error.message : "An unknown error occurred."
+      );
+    }
+  }
 }

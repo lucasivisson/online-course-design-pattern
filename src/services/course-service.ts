@@ -6,7 +6,7 @@ import { InputBuyCourseDto } from "@/business/dto/enrollment/enrollment-dto";
 export class CourseService {
   static async getCourses(): Promise<CourseEntity[]> {
     try {
-      const response = await api.get<{ data: CourseEntity[] }>("/api/course");
+      const response = await api.get<{ data: CourseEntity[] }>(`/api/course`);
 
       return response.data;
     } catch (error) {
@@ -15,10 +15,10 @@ export class CourseService {
     }
   }
 
-  static async getUserCourses(): Promise<EnrollmentEntity[]> {
+  static async getUserCourses(userId: string): Promise<EnrollmentEntity[]> {
     try {
       const response = await api.get<{ data: EnrollmentEntity[] }>(
-        `/api/enrollment/user-progress`
+        `/api/enrollment/user-progress?userId=${userId}`
       );
 
       return response.data;
@@ -42,11 +42,22 @@ export class CourseService {
 
   static async buyCourse(
     id: string,
+    userId: string,
     data: InputBuyCourseDto
   ): Promise<EnrollmentEntity> {
     const response = await api.post<{ data: EnrollmentEntity }>(
-      `/api/enrollment/${id}`,
+      `/api/enrollment/${id}?userId=${userId}`,
       data
+    );
+    return response.data;
+  }
+
+  static async getCoursesFromTeacher(
+    id: string,
+    userId: string
+  ): Promise<EnrollmentEntity> {
+    const response = await api.get<{ data: EnrollmentEntity }>(
+      `/api/courses/teacher/${id}?userId=${userId}`
     );
     return response.data;
   }
