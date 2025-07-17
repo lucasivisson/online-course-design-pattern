@@ -2,9 +2,11 @@
 
 import { api } from "@/config/api";
 import { CourseEntity } from "@/entities/course-entity";
+import { ModuleEntity } from "@/entities/module-entity";
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
+import { BiDuplicate } from "react-icons/bi";
 import { FaSpinner } from "react-icons/fa";
 import Modal from "react-modal";
 
@@ -42,6 +44,22 @@ export default function CourseManagement() {
     moduleId: string;
     classId: string;
   } | null>(null);
+  const [duplicateModalIsOpen, setDuplicateModalIsOpen] = useState(false);
+  const [moduleToDuplicate, setModuleToDuplicate] = useState<string | null>(
+    null
+  );
+  const [isDuplicating, setIsDuplicating] = useState(false);
+  const [newModuleName, setNewModuleName] = useState("");
+
+  const openDuplicateModal = (moduleId: string) => {
+    setModuleToDuplicate(moduleId);
+    setDuplicateModalIsOpen(true);
+  };
+
+  const closeDuplicateModal = () => {
+    setDuplicateModalIsOpen(false);
+    setModuleToDuplicate(null);
+  };
 
   const fetchCourseData = useCallback(async () => {
     setIsLoading(true);
@@ -49,7 +67,7 @@ export default function CourseManagement() {
       const courseData = await api.get<{ course: CourseEntity }>(
         `/api/course/${courseId}`
       );
-      console.log("Course data:", courseData);
+
       setCourse(courseData.course);
     } catch (error) {
       toast.error("Erro ao carregar dados do curso");
@@ -67,6 +85,42 @@ export default function CourseManagement() {
 
   const onHandleCreateLesson = (moduleId: string) => {
     router.push(`/criar-aula/${moduleId}`);
+  };
+
+  const onHandleDuplicateModule = async () => {
+    if (!moduleToDuplicate || isDuplicating) return;
+
+    if (!newModuleName.trim()) {
+      toast.error("Por favor, insira um nome para o novo módulo");
+      return;
+    }
+
+    try {
+      setIsDuplicating(true);
+      const toastId = toast.loading("Duplicando módulo...");
+
+      const data = await api.post<ModuleEntity>(
+        `/api/module/${moduleToDuplicate}/duplicate`,
+        {
+          name: newModuleName,
+        }
+      );
+
+      await api.patch(`/api/course/${courseId}`, {
+        modulesIds: [data.id],
+      });
+      toast.success("Módulo duplicado com sucesso!", { id: toastId });
+      closeDuplicateModal();
+      await fetchCourseData(); // Recarrega os dados do curso
+    } catch (err) {
+      const error = err as Error;
+      console.error("Erro ao duplicar módulo:", error);
+      toast.error(
+        error?.message || "Erro ao duplicar módulo. Tente novamente."
+      );
+    } finally {
+      setIsDuplicating(false);
+    }
   };
 
   const onHandleUpdateLesson = (moduleId: string, classId: string) => {
@@ -171,6 +225,62 @@ export default function CourseManagement() {
           </div>
         </div>
       </Modal>
+      <Modal
+        isOpen={duplicateModalIsOpen}
+        onRequestClose={closeDuplicateModal}
+        style={customStyles}
+        contentLabel="Confirmar duplicação"
+      >
+        <div className="p-4">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">
+            Duplicar Módulo
+          </h2>
+
+          <div className="mb-4">
+            <label
+              htmlFor="moduleName"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Nome do Novo Módulo <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="moduleName"
+              className="placeholder:text-gray-500 text-gray-700 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              value={newModuleName}
+              onChange={(e) => setNewModuleName(e.target.value)}
+              placeholder="Ex: Módulo 1 (Cópia)"
+              autoFocus
+            />
+          </div>
+
+          <div className="flex justify-end gap-3">
+            <button
+              onClick={closeDuplicateModal}
+              className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
+              disabled={isDuplicating}
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={onHandleDuplicateModule}
+              className={`px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-md ${
+                isDuplicating ? "opacity-70 cursor-not-allowed" : ""
+              }`}
+              disabled={isDuplicating || !newModuleName.trim()}
+            >
+              {isDuplicating ? (
+                <>
+                  <FaSpinner className="animate-spin inline mr-2" />
+                  Duplicando...
+                </>
+              ) : (
+                "Confirmar Duplicação"
+              )}
+            </button>
+          </div>
+        </div>
+      </Modal>
       <header className="flex justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
@@ -187,34 +297,6 @@ export default function CourseManagement() {
               aulas
             </span>
           </div>
-        </div>
-        <div>
-          <button className="flex cursor-pointer border border-[#E4E4E7] items-center gap-2 px-4 py-2 text-gray-900 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors duration-200">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="text-gray-900"
-            >
-              <path
-                d="M8 2H3.33333C2.97971 2 2.64057 2.14048 2.39052 2.39052C2.14048 2.64057 2 2.97971 2 3.33333V12.6667C2 13.0203 2.14048 13.3594 2.39052 13.6095C2.64057 13.8595 2.97971 14 3.33333 14H12.6667C13.0203 14 13.3594 13.8595 13.6095 13.6095C13.8595 13.3594 14 13.0203 14 12.6667V8"
-                stroke="currentColor"
-                strokeWidth="1.33333"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M12.2499 1.74991C12.5151 1.48469 12.8748 1.33569 13.2499 1.33569C13.625 1.33569 13.9847 1.48469 14.2499 1.74991C14.5151 2.01512 14.6641 2.37483 14.6641 2.74991C14.6641 3.12498 14.5151 3.48469 14.2499 3.74991L7.99992 9.99991L5.33325 10.6666L5.99992 7.99991L12.2499 1.74991Z"
-                stroke="currentColor"
-                strokeWidth="1.33333"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <span>Editar curso</span>
-          </button>
         </div>
       </header>
       <div className="mt-2 mb-8">
@@ -293,40 +375,50 @@ export default function CourseManagement() {
                   {module.classes.length} aulas
                 </span>
               </div>
-              <button
-                className="flex items-center justify-between font-medium cursor-pointer py-2 px-2 w-[140px] bg-[#16A34A] hover:bg-[#16a34ac4] text-white rounded-md"
-                onClick={() => onHandleCreateLesson(module.id)}
-              >
-                <svg
-                  width="17"
-                  height="16"
-                  viewBox="0 0 17 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
+              <div className="flex gap-2">
+                <button
+                  className="flex items-center justify-between font-medium cursor-pointer border border-[#E4E4E7] gap-2 px-4 py-2 text-gray-900 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors duration-200"
+                  onClick={() => openDuplicateModal(module.id)}
                 >
-                  <path
-                    d="M3.84888 8H13.1822"
-                    stroke="#FAFAFA"
-                    strokeWidth="1.33333"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M8.51562 3.33325V12.6666"
-                    stroke="#FAFAFA"
-                    strokeWidth="1.33333"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                <span
+                  <BiDuplicate />
+                  <span className="text-[14px]">Duplicar Módulo</span>
+                </button>
+
+                <button
+                  className="flex items-center justify-between font-medium cursor-pointer py-2 px-2 w-[140px] bg-[#16A34A] hover:bg-[#16a34ac4] text-white rounded-md"
                   onClick={() => onHandleCreateLesson(module.id)}
-                  className="text-[14px]"
                 >
-                  Adicionar Aula
-                </span>
-                <div />
-              </button>
+                  <svg
+                    width="17"
+                    height="16"
+                    viewBox="0 0 17 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M3.84888 8H13.1822"
+                      stroke="#FAFAFA"
+                      strokeWidth="1.33333"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M8.51562 3.33325V12.6666"
+                      stroke="#FAFAFA"
+                      strokeWidth="1.33333"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <span
+                    onClick={() => onHandleCreateLesson(module.id)}
+                    className="text-[14px]"
+                  >
+                    Adicionar Aula
+                  </span>
+                  <div />
+                </button>
+              </div>
             </div>
 
             <div className="divide-y">

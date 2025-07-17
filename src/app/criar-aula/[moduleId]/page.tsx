@@ -42,7 +42,7 @@ export default function CreateClassPage() {
     setIsLoadingQuizzes(true);
     try {
       const response = await api.get<{ quiz: Quiz[] }>("/api/quiz");
-      console.log(response);
+
       setQuizzes(response.quiz);
     } catch (error) {
       toast.error("Erro ao carregar quizzes");
