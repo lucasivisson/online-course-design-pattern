@@ -1,8 +1,34 @@
-"use client";
 import { Trash2, Upload } from "lucide-react";
-import React, { useState, useRef } from "react";
+import React, { useRef, useState } from "react";
 
-const DocumentUploader = () => {
+// Component for creating a new announcement/post, now accepting props
+export const CreateComment = ({
+  placeholder,
+}: {
+  placeholder: string;
+  onPublish: () => void;
+}) => {
+  // const [announcementText, setAnnouncementText] = useState("");
+
+  // const handleTextChange = (event) => {
+  //   setAnnouncementText(event.target.value);
+  // };
+
+  // const handlePublish = () => {
+  //   if (onPublish) {
+  //     onPublish(announcementText); // Pass the text to the parent's handler
+  //   }
+  //   setAnnouncementText(""); // Clear the textarea after publishing
+  // };
+
+  // // Function to show a custom message box instead of alert()
+  // const showMessageBox = (message) => {
+  //   // In a real application, you would implement a more sophisticated modal or toast notification
+  //   // For this example, we'll use a simple console log and a temporary visual cue if needed.
+  //   console.log("Message Box:", message);
+  //   // You could also add a temporary div to display the message on screen
+  //   // For now, we'll just log to console as alert() is disallowed.
+  // };
   const [message, setMessage] = useState("");
   const [document, setDocument] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -39,22 +65,19 @@ const DocumentUploader = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 max-w-2xl w-full mx-auto">
-      {/* Message Input */}
-      <h2 className="text-xl font-semibold text-gray-800 mb-12 text-center">
-        Informações da Mensagem
-      </h2>
-      <div className="flex flex-col gap-3 mb-10">
-        <label>Mensagem *</label>
+    <div>
+      <div className="flex items-center mb-4">
+        <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-bold text-lg mr-3">
+          {/* You can replace this with a user's profile picture */}U
+        </div>
         <textarea
-          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
-          rows={4}
-          placeholder="Escreva um aviso ou envie um documento para a turma"
+          className="flex-grow resize-none border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder={placeholder}
+          rows={1}
           value={message}
           onChange={handleMessageChange}
         ></textarea>
       </div>
-
       {/* Document Upload/Display Area */}
       <div className="relative mb-4">
         <input
@@ -100,7 +123,7 @@ const DocumentUploader = () => {
       </div>
 
       {/* Action Buttons (can add a Post/Send button here if needed) */}
-      <div className="flex justify-between">
+      <div className="flex justify-end gap-3">
         <button
           onClick={handleUploadButtonClick}
           className="p-2 w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all cursor-pointer"
@@ -110,15 +133,6 @@ const DocumentUploader = () => {
         </button>
 
         <div className="flex gap-2">
-          <button
-            className="px-6 py-2 bg-transparent text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50 transition-all cursor-pointer"
-            // You would typically handle form submission here
-            onClick={() =>
-              console.log("Message:", message, "Document:", document)
-            }
-          >
-            Cancelar
-          </button>
           <button
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all cursor-pointer"
             // You would typically handle form submission here
@@ -133,5 +147,3 @@ const DocumentUploader = () => {
     </div>
   );
 };
-
-export default DocumentUploader;
