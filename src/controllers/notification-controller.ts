@@ -47,7 +47,7 @@ export class NotificationController {
       const notifications = await this.notificationUseCase.read(dto);
 
       return new Response(JSON.stringify(notifications), {
-        status: 200,
+        status: 204,
         headers: {
           "Content-Type": "application/json",
         },

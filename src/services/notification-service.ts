@@ -6,7 +6,8 @@ export type InputCreateNotification = { notificationId: string }
 export class NotificationService {
   static async markAsRead(input: InputCreateNotification): Promise<unknown> {
     try {
-      await api.patch(`/api/notifications/${input.notificationId}`, {});
+      const a = await api.patch(`/api/notifications/${input.notificationId}`, {});
+      console.log('a', a)
       return {}
     } catch (error) {
       console.error("Error update notification:", error);
@@ -16,8 +17,9 @@ export class NotificationService {
 
   static async index(): Promise<NotificationEntity[]> {
     try {
-      const response = await api.get<{ notifications: NotificationEntity[] }>(`/api/notifications`);
-      return response.notifications;
+      const response = await api.get<NotificationEntity[]>(`/api/notifications`);
+      console.log('response', response)
+      return response;
     } catch (error) {
       console.error("Error fetching notifications:", error);
       throw new Error("Failed to fetch notifications");

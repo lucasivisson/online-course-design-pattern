@@ -109,9 +109,7 @@ const AnnouncementPost = ({
           </div>
           <div>
             <p className="font-semibold text-gray-800">{author}</p>
-            <p className="text-sm text-gray-500">
-              {time} {post.author}
-            </p>
+            <p className="text-sm text-gray-500">{time}</p>
           </div>
         </div>
         <PostCard

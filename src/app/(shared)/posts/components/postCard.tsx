@@ -21,7 +21,7 @@ const PostCard: React.FC<PostProps> = ({ post, handleDeletePost }) => {
   };
 
   return (
-    <div className="rounded-lg p-4 mb-4 relative">
+    <div className="rounded-lg mb-4 relative">
       <div className="flex justify-between items-center">
         <div className="relative">
           <button
