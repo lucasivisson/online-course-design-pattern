@@ -1,11 +1,13 @@
 import { Button } from "@/components/ui/button";
 import UsersIcon from "@/assets/users.svg";
 import CalendarIcon from "@/assets/calendar.svg";
+import BookIcon from "@/assets/book.svg";
 
 interface ManageCourseCardProps {
   title: string;
   status: string;
   students: number;
+  modules: number;
   lastUpdate: string;
   manageLink: string;
 }
@@ -14,6 +16,7 @@ export function ManageCourseCard({
   title,
   status,
   students,
+  modules,
   lastUpdate,
   manageLink,
 }: ManageCourseCardProps) {
@@ -29,6 +32,10 @@ export function ManageCourseCard({
         <div className="flex gap-1 items-center">
           <UsersIcon className="size-3" />
           <span>{students} alunos inscritos</span>
+        </div>
+        <div className="flex gap-1 items-center">
+          <BookIcon className="size-3" />
+          <span>{modules} módulos</span>
         </div>
         <div className="flex gap-1  items-center">
           <CalendarIcon className="size-3" />

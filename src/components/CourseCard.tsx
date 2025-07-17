@@ -1,9 +1,11 @@
 import { CourseEntity } from "@/entities/course-entity";
-import { cn } from "@/shared/utils";
+import { cn, formatPrice } from "@/shared/utils";
 import { Button } from "@/components/ui/button";
 import BookIcon from "@/assets/book.svg";
 import StarIcon from "@/assets/star.svg";
 import UsersIcon from "@/assets/users.svg";
+import { useAuth } from "../context/AuthContext";
+import { CheckIcon } from "lucide-react";
 
 interface CourseCardProps {
   course: CourseEntity;
@@ -12,6 +14,8 @@ interface CourseCardProps {
 }
 
 export function CourseCard({ index, course, onClick }: CourseCardProps) {
+  const { userId } = useAuth();
+
   const getRandomBackgroundColorBasedOnIndex = (index: number) => {
     const colors = [
       "bg-yellow-500/20",
@@ -24,6 +28,11 @@ export function CourseCard({ index, course, onClick }: CourseCardProps) {
     ];
     return colors[index % colors.length];
   };
+
+  const isEnrolled =
+    userId ===
+    course.enrollments?.find((enrollment) => enrollment.studentId === userId)
+      ?.studentId;
 
   return (
     <div className="bg-white overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 cursor-pointer border border-gray-200">
@@ -68,14 +77,26 @@ export function CourseCard({ index, course, onClick }: CourseCardProps) {
         </div>
 
         <div className="mt-4 pt-4 border-t border-gray-100">
-          <div className="max-xl:flex-col max-xl:gap-4 flex items-center justify-between text-xs text-gray-400">
+          <div className="flex-col gap-4 flex items-center justify-between text-xs text-gray-400">
             <span>
-              <span className="max-xl:text-3xl text-xl font-bold text-green-600">
-                R$ {course.price.toFixed(2)}
+              <span className="text-3xl  font-bold text-green-600">
+                {formatPrice(course.price)}
               </span>
             </span>
-            <Button onClick={onClick} variant="blue" className="max-xl:w-full">
-              Inscrever-se
+            <Button
+              onClick={onClick}
+              variant="blue"
+              size="lg"
+              disabled={isEnrolled}
+              className="w-full justify-center flex"
+            >
+              {isEnrolled ? (
+                <span className="flex items-center gap-2">
+                  Inscrito <CheckIcon className="size-4" />
+                </span>
+              ) : (
+                "Inscrever-se"
+              )}
             </Button>
           </div>
         </div>
