@@ -60,6 +60,7 @@ export class PostController {
           type: file.type,
         },
       });
+      console.log('input backend', input)
       const errors = await validate(input);
 
       if (errors.length > 0) return errorHandler(errors);

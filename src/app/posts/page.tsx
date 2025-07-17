@@ -1,9 +1,17 @@
 "use client";
 import React, { useState } from "react";
 import { CreateComment } from "./components/createPost";
+import { TransformedPost, usePosts } from "../hooks/usePosts";
+import { PostService } from "@/services/post-service";
+
+interface AnnouncementPost {
+  post: TransformedPost;
+  refetchPosts: () => void;
+}
 
 // Componente para uma única postagem de anúncio
-const AnnouncementPost = ({ author, time, content, comments }) => {
+const AnnouncementPost = ({ post, refetchPosts }: AnnouncementPost) => {
+  const { id, comments, author, time, content } = post;
   const [showCommentsSection, setShowCommentsSection] = useState(false);
   // Estado para controlar quantos comentários estão sendo exibidos
   const [displayedCommentsCount, setDisplayedCommentsCount] = useState(0); // Começa com 0 para não mostrar nenhum inicialmente
@@ -47,12 +55,25 @@ const AnnouncementPost = ({ author, time, content, comments }) => {
     setDisplayedCommentsCount(0); // Reseta a contagem para 0
   };
 
-  console.log("displayedCommentsCount", displayedCommentsCount);
-  console.log("COMMENTS_PER_LOAD", COMMENTS_PER_LOAD);
-
   const visibleComments = comments.slice(0, displayedCommentsCount);
   const hasMoreComments = displayedCommentsCount < comments.length;
   const canShowLess = displayedCommentsCount > 0;
+
+  // Função para adicionar um novo comentário (thread)
+  const handleAddComment = async (message?: string, file?: File) => {
+    try {
+      // Usar um authorId fixo para simulação, em um app real viria do contexto de autenticação
+      await PostService.addThreadOnPost({
+        postId: id,
+        message,
+        file,
+      });
+      refetchPosts(); // Recarrega os posts para mostrar o novo comentário
+    } catch (error) {
+      console.error("Erro ao adicionar comentário:", error);
+      // Exibir mensagem de erro para o usuário
+    }
+  };
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-md mb-4">
@@ -147,10 +168,10 @@ const AnnouncementPost = ({ author, time, content, comments }) => {
                           <p
                             className="text-sm font-medium text-blue-600 hover:underline cursor-pointer"
                             onClick={() =>
-                              window.open(comment.file.url, "_blank")
+                              window.open(comment.file?.url, "_blank")
                             }
                           >
-                            {comment.file.name}
+                            {comment.file?.fileName}
                           </p>
                           <p className="text-xs text-gray-500">
                             {comment.file.type}
@@ -201,8 +222,8 @@ const AnnouncementPost = ({ author, time, content, comments }) => {
 
       <CreateComment
         placeholder="Escreva um comentário nessa publicação"
-        // onPublish={handleNewAnnouncementPublish}
-        onPublish={() => {}}
+        onPublish={handleAddComment}
+        // profileInitial={currentUserId[0].toUpperCase()} // Usa a inicial do ID do usuário logado
       />
     </div>
   );
@@ -210,6 +231,11 @@ const AnnouncementPost = ({ author, time, content, comments }) => {
 
 // Componente da Página Principal
 const ClassroomPage = () => {
+  // IDs de exemplo (em um app real, viriam do contexto de autenticação ou rota)
+  const exampleCourseId = "687287a03968068265d0946e";
+
+  const { posts, loading, error, refetchPosts } = usePosts(exampleCourseId);
+
   const announcements = [
     {
       author: "Paulo Henrique Maia",
@@ -278,18 +304,69 @@ const ClassroomPage = () => {
     },
   ];
 
+  const handleNewAnnouncementPublish = async (
+    message?: string,
+    file?: File
+  ) => {
+    try {
+      if (file || message) {
+        await PostService.create({
+          courseId: exampleCourseId,
+          message,
+          file,
+        });
+        refetchPosts(); // Recarrega os posts após a criação
+      }
+    } catch (err) {
+      console.error("Erro ao criar novo anúncio:", err);
+      // Exibir mensagem de erro para o usuário
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <p className="text-gray-600">Carregando postagens...</p>
+      </div>
+    );
+  }
+
+  // if (error) {
+  //   return (
+  //     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+  //       <p className="text-red-600">Erro: {error}</p>
+  //       <button
+  //         className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+  //         onClick={refetchPosts}
+  //       >
+  //         Tentar Novamente
+  //       </button>
+  //     </div>
+  //   );
+  // }
+
   return (
     <div className="min-h-screen bg-gray-100 p-4 sm:p-6 md:p-8">
       <div className="max-w-3xl mx-auto">
         <div className="bg-white p-4 rounded-lg shadow-md mb-4">
           <CreateComment
             placeholder="Escreva um aviso para sua turma"
-            onPublish={() => {}}
+            onPublish={handleNewAnnouncementPublish}
+            // profileInitial={currentUserId[0].toUpperCase()} // Usa a inicial do ID do usuário logado
           />
         </div>
-        {announcements.map((announcement, index) => (
-          <AnnouncementPost key={index} {...announcement} />
+        {posts.map((announcement) => (
+          <AnnouncementPost
+            post={announcement}
+            key={announcement.id}
+            refetchPosts={refetchPosts}
+          />
         ))}
+        {posts.length === 0 && !loading && !error && (
+          <p className="text-center text-gray-500 mt-8">
+            Nenhuma postagem encontrada para este curso.
+          </p>
+        )}
       </div>
     </div>
   );

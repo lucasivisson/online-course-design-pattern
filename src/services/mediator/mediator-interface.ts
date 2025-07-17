@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // services/mediatorInterfaces.ts
 
+import { PostEntity } from "@/entities/post-entity";
+
 // Forward declaration para evitar circular dependencies se Component precisar do Mediator e vice-versa
 // Isso é uma simplificação para fins de exemplo
 interface Mediator {
     // O 'sender' será o componente que notificou o mediador.
     // O 'event' será uma string que descreve o que aconteceu.
-    notify(sender: BaseComponent, event: string, payload?: any): Promise<void>;
+    notify(sender: BaseComponent, event: string, payload?: any): Promise<PostEntity | undefined>;
 }
 
 class BaseComponent {

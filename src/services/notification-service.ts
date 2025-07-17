@@ -1,10 +1,10 @@
 import { api } from "@/config/api";
 import { NotificationEntity } from "@/entities/notification-entity";
 
-export type InputCreatePost = { notificationId: string }
+export type InputCreateNotification = { notificationId: string }
 
-export class PostService {
-  static async markAsRead(input: InputCreatePost): Promise<unknown> {
+export class NotificationService {
+  static async markAsRead(input: InputCreateNotification): Promise<unknown> {
     try {
       await api.patch(`/api/notifications/${input.notificationId}`, {});
       return {}

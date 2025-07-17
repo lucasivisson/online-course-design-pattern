@@ -4,37 +4,16 @@ import React, { useRef, useState } from "react";
 // Component for creating a new announcement/post, now accepting props
 export const CreateComment = ({
   placeholder,
+  onPublish,
+  profileInitial = "U",
 }: {
   placeholder: string;
-  onPublish: () => void;
+  onPublish: (message?: string, file?: File) => void;
+  profileInitial?: string;
 }) => {
-  // const [announcementText, setAnnouncementText] = useState("");
-
-  // const handleTextChange = (event) => {
-  //   setAnnouncementText(event.target.value);
-  // };
-
-  // const handlePublish = () => {
-  //   if (onPublish) {
-  //     onPublish(announcementText); // Pass the text to the parent's handler
-  //   }
-  //   setAnnouncementText(""); // Clear the textarea after publishing
-  // };
-
-  // // Function to show a custom message box instead of alert()
-  // const showMessageBox = (message) => {
-  //   // In a real application, you would implement a more sophisticated modal or toast notification
-  //   // For this example, we'll use a simple console log and a temporary visual cue if needed.
-  //   console.log("Message Box:", message);
-  //   // You could also add a temporary div to display the message on screen
-  //   // For now, we'll just log to console as alert() is disallowed.
-  // };
-  const [message, setMessage] = useState("");
-  const [document, setDocument] = useState<File | null>(null);
+  const [message, setMessage] = useState<string | undefined>(undefined);
+  const [document, setDocument] = useState<File | undefined>(undefined);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-  console.log("document", document);
-  console.log("message", message);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -46,14 +25,14 @@ export const CreateComment = ({
   };
 
   const handleRemoveDocument = () => {
-    setDocument(null);
+    setDocument(undefined);
     if (fileInputRef.current) {
       fileInputRef.current.value = ""; // Clear the file input
     }
   };
 
   const handleMessageChange = (event: {
-    target: { value: React.SetStateAction<string> };
+    target: { value: React.SetStateAction<string | undefined> };
   }) => {
     setMessage(event.target.value);
   };
@@ -64,11 +43,17 @@ export const CreateComment = ({
     }
   };
 
+  const handlePublishClick = () => {
+    onPublish(message, document); // Passa a mensagem e o documento
+    setMessage(undefined); // Limpa a mensagem
+    handleRemoveDocument(); // Remove o documento após a publicação
+  };
+
   return (
     <div>
       <div className="flex items-center mb-4">
         <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-bold text-lg mr-3">
-          {/* You can replace this with a user's profile picture */}U
+          {profileInitial}
         </div>
         <textarea
           className="flex-grow resize-none border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -136,9 +121,8 @@ export const CreateComment = ({
           <button
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all cursor-pointer"
             // You would typically handle form submission here
-            onClick={() =>
-              console.log("Message:", message, "Document:", document)
-            }
+            onClick={handlePublishClick}
+            disabled={!message && !document}
           >
             Publicar
           </button>

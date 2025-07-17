@@ -20,7 +20,7 @@ export async function saveFileToDisk(
   await writeFile(filePath, fileBuffer);
 
   // Caminho público para o front-end
-  return `public/uploads/${uniqueFileName}`;
+  return `uploads/${uniqueFileName}`;
 }
 
 export async function deleteUploadedFile(relativePath: string): Promise<void> {

@@ -29,17 +29,24 @@ async function request<TResponse = unknown, TRequest = unknown>(
   const { headers = {}, params, cache, next } = options;
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-
   const query = buildQuery(params);
   const fullUrl = `${API_URL}${url}${query}`;
 
+  const isFormData = typeof FormData !== "undefined" && data instanceof FormData;
+
   const res = await fetch(fullUrl, {
     method,
-    headers: {
-      "Content-Type": "application/json",
-      ...headers,
-    },
-    body: ["GET", "HEAD"].includes(method) ? undefined : JSON.stringify(data),
+    headers: isFormData
+      ? headers // não define Content-Type — o navegador faz isso automaticamente
+      : {
+          "Content-Type": "application/json",
+          ...headers,
+        },
+    body: ["GET", "HEAD"].includes(method)
+      ? undefined
+      : isFormData
+        ? data as BodyInit
+        : JSON.stringify(data),
     cache,
     next,
   });
@@ -51,6 +58,10 @@ async function request<TResponse = unknown, TRequest = unknown>(
       message: error?.message || "Request failed",
       raw: error,
     };
+  }
+
+  if (res.status === 204) {
+    return undefined as TResponse; // ou qualquer valor default que você quiser
   }
 
   const contentType = res.headers.get("content-type");

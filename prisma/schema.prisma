@@ -3,10 +3,11 @@
 
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-generator erd {
-  provider = "prisma-erd-generator"
-  output   = "database-diagram.svg"
-}
+// generator erd {
+//   provider = "prisma-erd-generator"
+//   output   = "database-diagram.svg"
+// }
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -109,16 +110,17 @@ model Notification {
 }
 
 model Post {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  message   String?
-  courseId  String   @db.ObjectId
-  course    Course   @relation(fields: [courseId], references: [id])
-  authorId  String   @db.ObjectId
-  author    User     @relation("AuthorPosts", fields: [authorId], references: [id])
-  thread    Thread[]
-  file      File?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  message    String?
+  courseId   String   @db.ObjectId
+  course     Course   @relation(fields: [courseId], references: [id])
+  authorId   String   @db.ObjectId
+  authorName String
+  author     User     @relation("AuthorPosts", fields: [authorId], references: [id])
+  thread     Thread[]
+  file       File?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 type File {
@@ -128,9 +130,11 @@ type File {
 }
 
 type Thread {
-  authorId String
-  message  String?
-  file     File?
+  authorId   String
+  authorName String
+  message    String?
+  file       File?
+  createdAt  DateTime
 }
 
 model Enrollments {

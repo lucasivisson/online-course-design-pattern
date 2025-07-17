@@ -1,2 +1,2 @@
-export const USER_ID = "68649700d492e36eaac82de4"; // Student ID
-export const TEACHER_ID = "686496ffd492e36eaac82de3"; // Professor ID
+export const USER_ID = "687281a5869b62998f6a72c3"; // Student ID
+export const TEACHER_ID = "68728638869b62998f6a72c4"; // Professor ID

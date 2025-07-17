@@ -2,7 +2,7 @@ import { CourseEntity } from "@/entities/course-entity";
 import { api } from "@/config/api";
 import { PostEntity } from "@/entities/post-entity";
 
-export type InputCreatePost = { courseId: string, authorId: string, message?: string, file?: File }
+export type InputCreatePost = { courseId: string, message?: string, file?: File }
 
 export class PostService {
   static async create(input: InputCreatePost): Promise<unknown> {
@@ -15,7 +15,7 @@ export class PostService {
 
       if(!input.message && !input.file) {
         throw new Error("Any attribute need to be passed");
-      }  
+      }
 
       await api.post("/api/posts", formData);
       return {}
@@ -27,8 +27,8 @@ export class PostService {
 
   static async index(input: { courseId: string }): Promise<PostEntity[]> {
     try {
-      const response = await api.get<{ posts: PostEntity[] }>(`/api/posts/course/${input.courseId}`);
-      return response.posts;
+      const response = await api.get<PostEntity[]>(`/api/posts/course/${input.courseId}`);
+      return response;
     } catch (error) {
       console.error("Error fetching posts:", error);
       throw new Error("Failed to fetch posts");

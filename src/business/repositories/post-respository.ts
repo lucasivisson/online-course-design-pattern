@@ -5,8 +5,9 @@ export type InputCreateUpdatePost = {
   message: string | null,
   courseId: string,
   authorId: string,
+  authorName: string,
   file: FileEntity | null
-  thread: { authorId: string, message: string | null, file: {
+  thread: { authorId: string, authorName: string, message: string | null, file: {
     fileName: string;
     type: string;
     url: string;

@@ -10,10 +10,15 @@ import { BaseComponent, Mediator } from './mediator-interface';
 import { getCourseNotificationObserver } from '../observer/notification-observer';
 import { AddThreadComponent, PostCreatorComponent } from './communication-components';
 import { saveFileToDisk } from '@/shared/storageService';
+import { PostEntity } from '@/entities/post-entity';
 
 // Para o Next.js, é importante garantir que o mapa de mediadores seja um singleton global
 declare global {
   var courseMediatorsGlobal: { [courseId: string]: CourseMediator } | undefined;
+}
+
+export interface OutputNotifyMediator {
+  post: PostEntity
 }
 
 class CourseMediator implements Mediator {
@@ -42,7 +47,7 @@ class CourseMediator implements Mediator {
   }
 
   // O método principal que o Mediator usa para reagir a eventos dos componentes.
-  public async notify(sender: BaseComponent, event: string, payload?: any): Promise<void> {
+  public async notify(sender: BaseComponent, event: string, payload?: any): Promise<PostEntity | undefined> {
     console.log(`Mediator para curso ${this.courseId}: Recebeu evento "${event}" do sender:`, sender.constructor.name);
 
     // Lógica para criar um Post
@@ -61,26 +66,28 @@ class CourseMediator implements Mediator {
         }
       }
 
-      const newPost = await this.postRepository.create({
-        courseId: courseId,
-        authorId: authorId,
-        message: message,
-        file: fileObject ? fileObject : null,
-        thread: []
-      });
-
-      // Notificar todos os participantes do curso (via Observer)
-      const notificationObserver = getCourseNotificationObserver(courseId);
       const author = await this.userRepository.getBy({ id: authorId });
       const course = await this.courseRepository.get({ courseId: courseId });
 
       if (author && course) {
+        const postCreated = await this.postRepository.create({
+          courseId: courseId,
+          authorId: authorId,
+          authorName: author.name,
+          message: message,
+          file: fileObject ? fileObject : null,
+          thread: []
+        });
+
+        // Notificar todos os participantes do curso (via Observer)
+        const notificationObserver = getCourseNotificationObserver(courseId);
+
         const postContentSummary = message ? message : 'um arquivo em anexo.';
         const notificationMessage = `${author.name} postou "${postContentSummary}" no curso "${course.name}"!`;
-        console.log(`Mediator: Post ${newPost.id} criado e notificação disparada.`);
+        console.log(`Mediator: Post ${postCreated.id} criado e notificação disparada.`);
         await notificationObserver.notify(notificationMessage, authorId, authorId);
+        return postCreated
       }
-
     }
 
     // Lógica para adicionar uma Thread
@@ -106,36 +113,37 @@ class CourseMediator implements Mediator {
         }
       }
 
-      const newThreadData = {
-        authorId: authorId,
-        message: message || null,
-        file: fileObject ? fileObject : null,
-      };
-
-      const newThread = post.thread ? [...post.thread, newThreadData] : [newThreadData]
-
-      await this.postRepository.update({
-        postId,
-        dataToUpdate: {
-          thread: newThread
-        },
-      });
-
-      // Notificar o autor do post original e todos os participantes do curso (via Observer)
+            // Notificar o autor do post original e todos os participantes do curso (via Observer)
       const notificationObserver = getCourseNotificationObserver(courseId);
       const author = await this.userRepository.getBy({ id: authorId });
       const course = await this.courseRepository.getBy({ id: courseId });
 
       if (author && course) {
+        const newThreadData = {
+          authorId: authorId,
+          authorName: author.name,
+          message: message || null,
+          file: fileObject ? fileObject : null,
+          createdAt: new Date()
+        };
+
+        const newThread = post.thread ? [...post.thread, newThreadData] : [newThreadData]
+
+        const postCreated = await this.postRepository.update({
+          postId,
+          dataToUpdate: {
+            thread: newThread
+          },
+        });
+
         const threadContentSummary = message ? message : 'um arquivo anexo.';
         const notificationMessage = `${author.name} respondeu "${threadContentSummary}" em um post no curso "${course.name}"!`;
         await notificationObserver.notify(notificationMessage, authorId, authorId);
-
+        console.log(`Mediator: Thread adicionada ao post ${postId} e notificação disparada.`);
+        return postCreated
         // Se precisar de notificação específica para o autor do post, pode ser feito aqui
         // Ex: if (authorId !== post.authorId && post.authorId) { /* Lógica de notificação direta */ }
       }
-
-      console.log(`Mediator: Thread adicionada ao post ${postId} e notificação disparada.`);
     }
   }
 
