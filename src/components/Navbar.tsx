@@ -22,7 +22,7 @@ export function Navbar({ showBackButton = false }: NavbarProps) {
   const pathname = usePathname();
   const { userId, isTeacher } = useAuth();
   const { notifications, markNotificationAsRead, countNotReadedNotifications } =
-    useNotifications();
+    useNotifications(userId);
 
   const [notificationsNotReaded, setNotificationsNotReaded] =
     useState<number>(0);

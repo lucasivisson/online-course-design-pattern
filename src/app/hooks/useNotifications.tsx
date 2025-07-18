@@ -18,39 +18,42 @@ interface UseNotificationsResult {
   ) => number;
 }
 
-export const useNotifications = (): UseNotificationsResult => {
+export const useNotifications = (
+  userId: string | null
+): UseNotificationsResult => {
   const [notifications, setNotifications] = useState<NotificationEntity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchNotifications = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await NotificationService.index();
-      setNotifications(result);
-    } catch (err) {
-      console.error(err);
-      setError("Erro ao carregar notificações.");
-    } finally {
-      setLoading(false);
+    if (userId) {
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await NotificationService.index(userId);
+        setNotifications(result);
+      } catch (err) {
+        console.error(err);
+        setError("Erro ao carregar notificações.");
+      } finally {
+        setLoading(false);
+      }
     }
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
-    fetchNotifications();
-  }, [fetchNotifications]);
+    if (userId) {
+      fetchNotifications();
+    }
+  }, [fetchNotifications, userId]);
 
   const countNotReadedNotifications = (
     notifications: NotificationEntity[],
     userId: string
   ): number => {
-    console.log("countNotReadedNotifications.notifications", notifications);
-    console.log("countNotReadedNotifications.userId", userId);
     const notificationsQtt = notifications.filter(
       (notification) => !notification.readBy.includes(userId)
     ).length;
-    console.log("notificationsQtt", notificationsQtt);
     return notificationsQtt;
   };
 
@@ -59,7 +62,7 @@ export const useNotifications = (): UseNotificationsResult => {
     userId: string
   ) => {
     try {
-      await NotificationService.markAsRead({ notificationId });
+      await NotificationService.markAsRead({ notificationId, userId });
       setNotifications((prev) =>
         prev.map((n) =>
           n.id === notificationId ? { ...n, readBy: [...n.readBy, userId] } : n

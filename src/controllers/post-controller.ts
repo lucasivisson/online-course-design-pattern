@@ -19,8 +19,21 @@ export class PostController {
     this.postUseCase = new PostUseCase(new PrismaPostRepository());
   }
 
-  async delete(userId: string, postId: string) {
+  async delete(req: NextRequest, postId: string) {
     try {
+      const userId = req.nextUrl.searchParams.get("userId");
+
+      if (!userId) {
+        return errorHandler([
+          {
+            property: "userId",
+            constraints: {
+              isNotEmpty: "userId é necessário",
+            },
+          },
+        ]);
+      }
+
       const dto = plainToInstance(InputDeletePostDto, { userId, postId });
       const errors = await validate(dto);
 
@@ -81,8 +94,20 @@ export class PostController {
     }
   }
 
-  async addThreadOnPost(req: NextRequest, userId: string, postId: string) {
+  async addThreadOnPost(req: NextRequest, postId: string) {
     try {
+      const userId = req.nextUrl.searchParams.get("userId");
+
+      if (!userId) {
+        return errorHandler([
+          {
+            property: "userId",
+            constraints: {
+              isNotEmpty: "userId é necessário",
+            },
+          },
+        ]);
+      }
       const formData = await req.formData();
 
       const message = formData.get('message') as string;
@@ -121,8 +146,20 @@ export class PostController {
     }
   }
 
-  async list(userId: string, courseId: string) {
+  async list(req: NextRequest, courseId: string) {
     try {
+      const userId = req.nextUrl.searchParams.get("userId");
+
+      if (!userId) {
+        return errorHandler([
+          {
+            property: "userId",
+            constraints: {
+              isNotEmpty: "userId é necessário",
+            },
+          },
+        ]);
+      }
       console.log('{ userId, courseId }', { userId, courseId })
       const dto = plainToInstance(InputListPostsDto, { userId, courseId });
       const errors = await validate(dto);

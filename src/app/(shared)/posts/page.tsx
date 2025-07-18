@@ -5,12 +5,14 @@ import { PostService } from "@/services/post-service";
 import { TransformedPost, usePosts } from "@/app/hooks/usePosts";
 import { PostEntity } from "@/entities/post-entity";
 import PostCard from "./components/postCard";
+import { useAuth } from "@/context/AuthContext";
 
 interface AnnouncementPost {
   post: TransformedPost;
   refetchPosts?: () => void;
   handleUpdatePost: (post: PostEntity) => void;
   handleDeletePost: (postId: string) => void;
+  userId: string | null;
 }
 
 // Componente para uma única postagem de anúncio
@@ -18,6 +20,7 @@ const AnnouncementPost = ({
   post,
   handleUpdatePost,
   handleDeletePost,
+  userId,
 }: AnnouncementPost) => {
   const { id, comments, author, time, content, file } = post;
   const [showCommentsSection, setShowCommentsSection] = useState(false);
@@ -69,34 +72,40 @@ const AnnouncementPost = ({
 
   // Função para adicionar um novo comentário (thread)
   const handleAddComment = async (message?: string, file?: File) => {
-    try {
-      // Usar um authorId fixo para simulação, em um app real viria do contexto de autenticação
-      const post = await PostService.addThreadOnPost({
-        postId: id,
-        message,
-        file,
-      });
-      handleUpdatePost(post);
-      // refetchPosts(); // Recarrega os posts para mostrar o novo comentário
-    } catch (error) {
-      console.error("Erro ao adicionar comentário:", error);
-      throw new Error();
-      // Exibir mensagem de erro para o usuário
+    if (userId) {
+      try {
+        // Usar um authorId fixo para simulação, em um app real viria do contexto de autenticação
+        const post = await PostService.addThreadOnPost({
+          postId: id,
+          message,
+          file,
+          userId,
+        });
+        handleUpdatePost(post);
+        // refetchPosts(); // Recarrega os posts para mostrar o novo comentário
+      } catch (error) {
+        console.error("Erro ao adicionar comentário:", error);
+        throw new Error();
+        // Exibir mensagem de erro para o usuário
+      }
     }
   };
 
   const handlePostDeleted = async (id: string) => {
-    try {
-      // Usar um authorId fixo para simulação, em um app real viria do contexto de autenticação
-      await PostService.delete({
-        postId: id,
-      });
-      handleDeletePost(id);
-      // refetchPosts(); // Recarrega os posts para mostrar o novo comentário
-    } catch (error) {
-      console.error("Erro ao adicionar comentário:", error);
-      throw new Error();
-      // Exibir mensagem de erro para o usuário
+    if (userId) {
+      try {
+        // Usar um authorId fixo para simulação, em um app real viria do contexto de autenticação
+        await PostService.delete({
+          postId: id,
+          userId,
+        });
+        handleDeletePost(id);
+        // refetchPosts(); // Recarrega os posts para mostrar o novo comentário
+      } catch (error) {
+        console.error("Erro ao adicionar comentário:", error);
+        throw new Error();
+        // Exibir mensagem de erro para o usuário
+      }
     }
   };
 
@@ -116,6 +125,7 @@ const AnnouncementPost = ({
           key={post.id}
           post={post}
           handleDeletePost={handlePostDeleted}
+          userId={userId}
         />
       </div>
       <p className="text-gray-700 mb-4 whitespace-pre-wrap">{content}</p>
@@ -274,8 +284,10 @@ const AnnouncementPost = ({
 
 // Componente da Página Principal
 const ClassroomPage = () => {
+  // TODO: find courseId correctly
   // IDs de exemplo (em um app real, viriam do contexto de autenticação ou rota)
   const exampleCourseId = "687287a03968068265d0946e";
+  const { userId } = useAuth();
 
   const {
     posts,
@@ -284,27 +296,30 @@ const ClassroomPage = () => {
     handleAddPost,
     handleUpdatePost,
     handleDeletePost,
-  } = usePosts(exampleCourseId);
+  } = usePosts(exampleCourseId, userId);
 
   const handleNewAnnouncementPublish = async (
     message?: string,
     file?: File
   ) => {
-    try {
-      if (file || message) {
-        const post = await PostService.create({
-          courseId: exampleCourseId,
-          message,
-          file,
-        });
-        handleAddPost(post);
+    if (userId) {
+      try {
+        if (file || message) {
+          const post = await PostService.create({
+            courseId: exampleCourseId,
+            message,
+            file,
+            userId,
+          });
+          handleAddPost(post);
 
-        // refetchPosts(); // Recarrega os posts após a criação
+          // refetchPosts(); // Recarrega os posts após a criação
+        }
+      } catch (err) {
+        console.error("Erro ao criar novo anúncio:", err);
+        throw new Error();
+        // Exibir mensagem de erro para o usuário
       }
-    } catch (err) {
-      console.error("Erro ao criar novo anúncio:", err);
-      throw new Error();
-      // Exibir mensagem de erro para o usuário
     }
   };
 
@@ -346,6 +361,7 @@ const ClassroomPage = () => {
             key={announcement.id}
             handleUpdatePost={handleUpdatePost}
             handleDeletePost={handleDeletePost}
+            userId={userId}
           />
         ))}
         {posts.length === 0 && !loading && !error && (

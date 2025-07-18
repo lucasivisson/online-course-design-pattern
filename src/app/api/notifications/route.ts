@@ -1,8 +1,8 @@
 import { NotificationController } from "@/controllers/notification-controller";
-import { USER_ID } from "@/shared/constants";
+import { NextRequest } from "next/server";
 
 const controller = new NotificationController();
 
-export const GET = async () => {
-  return controller.list(USER_ID);
+export const GET = async (req: NextRequest) => {
+  return controller.list(req);
 };

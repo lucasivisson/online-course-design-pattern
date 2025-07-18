@@ -2,7 +2,7 @@ import { CourseEntity } from "@/entities/course-entity";
 import { api } from "@/config/api";
 import { PostEntity } from "@/entities/post-entity";
 
-export type InputCreatePost = { courseId: string, message?: string, file?: File }
+export type InputCreatePost = { courseId: string, message?: string, file?: File, userId: string }
 
 export class PostService {
   static async create(input: InputCreatePost): Promise<PostEntity> {
@@ -17,7 +17,7 @@ export class PostService {
         throw new Error("Any attribute need to be passed");
       }
 
-      const response = await api.post<{post: PostEntity}>("/api/posts", formData);
+      const response = await api.post<{post: PostEntity}>("/api/posts?userId=${userId}", formData);
       return response.post
     } catch (error) {
       console.error("Error fetching courses:", error);
@@ -25,9 +25,9 @@ export class PostService {
     }
   }
 
-  static async index(input: { courseId: string }): Promise<PostEntity[]> {
+  static async index(input: { courseId: string, userId: string }): Promise<PostEntity[]> {
     try {
-      const response = await api.get<PostEntity[]>(`/api/posts/course/${input.courseId}`);
+      const response = await api.get<PostEntity[]>(`/api/posts/course/${input.courseId}?userId=${input.userId}`);
       return response;
     } catch (error) {
       console.error("Error fetching posts:", error);
@@ -35,7 +35,7 @@ export class PostService {
     }
   }
 
-  static async addThreadOnPost(input: { postId: string, message?: string, file?: File }): Promise<PostEntity> {
+  static async addThreadOnPost(input: { postId: string, message?: string, file?: File, userId: string }): Promise<PostEntity> {
     try {
       const formData = new FormData();
       if (input.message) formData.append("message", input.message);
@@ -45,7 +45,7 @@ export class PostService {
       if(!input.message && !input.file) {
         throw new Error("Any attribute need to be passed");
       }
-      const response = await api.patch<{ post: PostEntity }>(`/api/posts/${input.postId}`, formData);
+      const response = await api.patch<{ post: PostEntity }>(`/api/posts/${input.postId}?userId=${input.userId}`, formData);
       return response.post
     } catch (error) {
       console.error("Error fetching course:", error);
@@ -53,9 +53,9 @@ export class PostService {
     }
   }
 
-  static async delete(input: { postId: string }): Promise<unknown> {
+  static async delete(input: { postId: string, userId: string }): Promise<unknown> {
     try {
-      await api.delete<CourseEntity>(`/api/posts/${input.postId}`);
+      await api.delete<CourseEntity>(`/api/posts/${input.postId}?userId=${input.userId}`);
       return {}
     } catch (error) {
       console.error("Error fetching course:", error);

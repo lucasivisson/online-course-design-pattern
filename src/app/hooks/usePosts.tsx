@@ -50,39 +50,46 @@ const formatTime = (date: Date): string => {
   return date.toLocaleDateString("pt-BR", { day: "numeric", month: "short" });
 };
 
-export const usePosts = (courseId: string): UsePostsResult => {
+export const usePosts = (
+  courseId: string,
+  userId: string | null
+): UsePostsResult => {
   const [posts, setPosts] = useState<TransformedPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchPosts = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const fetchedPosts = await PostService.index({ courseId });
-      const transformedPosts: TransformedPost[] = fetchedPosts.map((post) => ({
-        id: post.id,
-        author: post.authorName, // Usa nome mapeado ou o ID
-        authorId: post.authorId,
-        time: formatTime(new Date(post.createdAt)), // Formata a data de criação do post
-        content: post.message,
-        file: post.file,
-        comments: post.thread.map((threadItem) => ({
-          author: threadItem.authorName,
-          time: formatTime(new Date(threadItem.createdAt)), // Formata a data de criação do comentário
-          text: threadItem.message,
-          file: threadItem.file,
-        })),
-        rawPost: post, // Guarda a postagem original se precisar
-      }));
-      setPosts(transformedPosts);
-    } catch (err) {
-      setError("Erro ao carregar postagens.");
-      console.error(err);
-    } finally {
-      setLoading(false);
+    if (userId) {
+      setLoading(true);
+      setError(null);
+      try {
+        const fetchedPosts = await PostService.index({ courseId, userId });
+        const transformedPosts: TransformedPost[] = fetchedPosts.map(
+          (post) => ({
+            id: post.id,
+            author: post.authorName, // Usa nome mapeado ou o ID
+            authorId: post.authorId,
+            time: formatTime(new Date(post.createdAt)), // Formata a data de criação do post
+            content: post.message,
+            file: post.file,
+            comments: post.thread.map((threadItem) => ({
+              author: threadItem.authorName,
+              time: formatTime(new Date(threadItem.createdAt)), // Formata a data de criação do comentário
+              text: threadItem.message,
+              file: threadItem.file,
+            })),
+            rawPost: post, // Guarda a postagem original se precisar
+          })
+        );
+        setPosts(transformedPosts);
+      } catch (err) {
+        setError("Erro ao carregar postagens.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     }
-  }, [courseId]); // Dependências do useCallback
+  }, [courseId, userId]); // Dependências do useCallback
 
   useEffect(() => {
     fetchPosts();
