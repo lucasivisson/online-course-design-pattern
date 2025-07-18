@@ -1,16 +1,12 @@
 "use client";
 import { api } from "@/config/api";
 import { ModuleEntity } from "@/entities/module-entity";
+import { QuizEntity } from "@/entities/quiz-entity";
 import { Class } from "@prisma/client";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
 import { FaSpinner } from "react-icons/fa";
-
-interface Quiz {
-  id: string;
-  title: string;
-}
 
 export default function UpdateClassPage() {
   const router = useRouter();
@@ -20,7 +16,7 @@ export default function UpdateClassPage() {
   const classId = searchParams.get("aulaId") as string;
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [quizzes, setQuizzes] = useState<QuizEntity[]>([]);
   const [isLoadingQuizzes, setIsLoadingQuizzes] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [initialData, setInitialData] = useState<Class | null>(null);
@@ -79,7 +75,7 @@ export default function UpdateClassPage() {
   const fetchQuizzes = async () => {
     setIsLoadingQuizzes(true);
     try {
-      const response = await api.get<Quiz[]>("/api/quiz");
+      const response = await api.get<QuizEntity[]>("/api/quiz");
       setQuizzes(response);
     } catch (error) {
       toast.error("Erro ao carregar quizzes");
@@ -273,7 +269,7 @@ export default function UpdateClassPage() {
                   </option>
                   {quizzes.map((quiz) => (
                     <option key={quiz.id} value={quiz.id}>
-                      {quiz.title}
+                      {quiz.name}
                     </option>
                   ))}
                 </select>
