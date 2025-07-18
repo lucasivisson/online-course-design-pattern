@@ -69,6 +69,9 @@ class CourseMediator implements Mediator {
       const author = await this.userRepository.getBy({ id: authorId });
       const course = await this.courseRepository.get({ courseId: courseId });
 
+      console.log('author', author)
+      console.log('course', course)
+
       if (author && course) {
         const postCreated = await this.postRepository.create({
           courseId: courseId,

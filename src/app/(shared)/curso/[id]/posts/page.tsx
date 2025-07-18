@@ -6,6 +6,8 @@ import { TransformedPost, usePosts } from "@/app/hooks/usePosts";
 import { PostEntity } from "@/entities/post-entity";
 import PostCard from "./components/postCard";
 import { useAuth } from "@/context/AuthContext";
+import { useParams } from "next/navigation";
+import { TEACHER_ID } from "@/shared/constants";
 
 interface AnnouncementPost {
   post: TransformedPost;
@@ -149,7 +151,7 @@ const AnnouncementPost = ({
           <div>
             <p
               className="text-sm font-medium text-blue-600 hover:underline cursor-pointer"
-              onClick={() => window.open(file?.url, "_blank")}
+              onClick={() => window.open(`/${file?.url}`, "_blank")}
             >
               {file?.fileName}
             </p>
@@ -220,7 +222,7 @@ const AnnouncementPost = ({
                           <p
                             className="text-sm font-medium text-blue-600 hover:underline cursor-pointer"
                             onClick={() =>
-                              window.open(comment.file?.url, "_blank")
+                              window.open(`/${comment.file?.url}`, "_blank")
                             }
                           >
                             {comment.file?.fileName}
@@ -276,7 +278,7 @@ const AnnouncementPost = ({
         placeholder="Escreva um comentário nessa publicação"
         onPublish={handleAddComment}
         textButton="Comentar"
-        // profileInitial={currentUserId[0].toUpperCase()} // Usa a inicial do ID do usuário logado
+        profileInitial={userId === TEACHER_ID ? "P" : "E"}
       />
     </div>
   );
@@ -284,9 +286,8 @@ const AnnouncementPost = ({
 
 // Componente da Página Principal
 const ClassroomPage = () => {
-  // TODO: find courseId correctly
-  // IDs de exemplo (em um app real, viriam do contexto de autenticação ou rota)
-  const exampleCourseId = "687287a03968068265d0946e";
+  const params = useParams();
+  const courseId = params.id as string;
   const { userId } = useAuth();
 
   const {
@@ -296,7 +297,7 @@ const ClassroomPage = () => {
     handleAddPost,
     handleUpdatePost,
     handleDeletePost,
-  } = usePosts(exampleCourseId, userId);
+  } = usePosts(courseId, userId);
 
   const handleNewAnnouncementPublish = async (
     message?: string,
@@ -304,9 +305,10 @@ const ClassroomPage = () => {
   ) => {
     if (userId) {
       try {
+        console.log("userId", userId);
         if (file || message) {
           const post = await PostService.create({
-            courseId: exampleCourseId,
+            courseId: courseId,
             message,
             file,
             userId,
@@ -352,6 +354,7 @@ const ClassroomPage = () => {
           <CreateComment
             placeholder="Escreva um aviso para sua turma"
             onPublish={handleNewAnnouncementPublish}
+            profileInitial={userId === TEACHER_ID ? "P" : "E"}
             // profileInitial={currentUserId[0].toUpperCase()} // Usa a inicial do ID do usuário logado
           />
         </div>

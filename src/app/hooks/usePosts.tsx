@@ -96,6 +96,7 @@ export const usePosts = (
   }, [fetchPosts]); // Chama fetchPosts quando o hook é montado ou fetchPosts muda
 
   const handleAddPost = (post: PostEntity) => {
+    console.log("post", post);
     setPosts((prevState) => [
       {
         id: post.id,

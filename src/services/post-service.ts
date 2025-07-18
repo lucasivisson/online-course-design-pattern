@@ -17,7 +17,7 @@ export class PostService {
         throw new Error("Any attribute need to be passed");
       }
 
-      const response = await api.post<{post: PostEntity}>("/api/posts?userId=${userId}", formData);
+      const response = await api.post<{post: PostEntity}>(`/api/posts?userId=${input.userId}`, formData);
       return response.post
     } catch (error) {
       console.error("Error fetching courses:", error);

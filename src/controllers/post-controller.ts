@@ -10,7 +10,6 @@ import {
   InputDeletePostDto,
   InputListPostsDto,
 } from "@/business/dto/posts/posts-dto";
-import { USER_ID } from "@/shared/constants";
 
 export class PostController {
   private postUseCase: PostUseCase;
@@ -57,6 +56,18 @@ export class PostController {
 
   async create(req: NextRequest) {
     try {
+      const userId = req.nextUrl.searchParams.get("userId");
+
+      if (!userId) {
+        return errorHandler([
+          {
+            property: "userId",
+            constraints: {
+              isNotEmpty: "userId é necessário",
+            },
+          },
+        ]);
+      }
       const formData = await req.formData();
 
       const courseId = formData.get('courseId') as string;
@@ -65,7 +76,7 @@ export class PostController {
 
       const input = plainToInstance(InputCreatePostDto, {
         courseId,
-        authorId: USER_ID,
+        authorId: userId,
         message,
         file: file && {
           fileBuffer: Buffer.from(await file.arrayBuffer()),

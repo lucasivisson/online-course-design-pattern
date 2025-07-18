@@ -431,27 +431,31 @@ export default function CourseManagement() {
         </span>
       </div>
 
-      {isTeacher && (
-        <div className="flex gap-4 mb-8">
-          <button className="flex cursor-pointer justify-center items-center gap-2 w-[25%] py-4 px-2 text-white bg-[#2563EB] hover:bg-[#2564ebd8] rounded-md transition-colors duration-200">
-            <svg
-              width="17"
-              height="16"
-              viewBox="0 0 17 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M4 2L13.3333 8L4 14V2Z"
-                stroke="white"
-                strokeWidth="1.33333"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <span className="font-medium">Publicar trabalho</span>
-          </button>
+      <div className="flex gap-4 mb-8">
+        <Button
+          className="flex cursor-pointer justify-center items-center gap-2 w-[25%] py-4 px-2 text-white bg-[#2563EB] hover:bg-[#2564ebd8] rounded-md transition-colors duration-200"
+          href={`/curso/${courseId}/posts`}
+          variant="blue"
+        >
+          <svg
+            width="17"
+            height="16"
+            viewBox="0 0 17 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 2L13.3333 8L4 14V2Z"
+              stroke="white"
+              strokeWidth="1.33333"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <span className="font-medium">Ir para mural</span>
+        </Button>
 
+        {isTeacher && (
           <button
             onClick={onHandleCreateQuiz}
             className="flex cursor-pointer justify-center items-center gap-2 w-[25%] py-4 px-2 text-white bg-[#9333EA] hover:bg-[#9233eaa6] rounded-md transition-colors duration-200"
@@ -474,8 +478,8 @@ export default function CourseManagement() {
 
             <span className="font-medium">Criar quiz</span>
           </button>
-        </div>
-      )}
+        )}
+      </div>
       <hr />
       <div className="mt-4">
         <div className="flex items-center justify-between mb-4">

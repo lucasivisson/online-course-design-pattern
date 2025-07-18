@@ -27,8 +27,6 @@ export const CreateComment = ({
     }
   };
 
-  console.log("message", message);
-
   const handleRemoveDocument = () => {
     setDocument(undefined);
     if (fileInputRef.current) {
