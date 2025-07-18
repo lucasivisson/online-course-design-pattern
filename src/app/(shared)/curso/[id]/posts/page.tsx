@@ -8,6 +8,8 @@ import PostCard from "./components/postCard";
 import { useAuth } from "@/context/AuthContext";
 import { useParams } from "next/navigation";
 import { TEACHER_ID } from "@/shared/constants";
+import { Button } from "@/components/ui/button";
+import ArrowIcon from "@/assets/arrow.svg";
 
 interface AnnouncementPost {
   post: TransformedPost;
@@ -349,29 +351,39 @@ const ClassroomPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 sm:p-6 md:p-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-white p-4 rounded-lg shadow-md mb-4">
-          <CreateComment
-            placeholder="Escreva um aviso para sua turma"
-            onPublish={handleNewAnnouncementPublish}
-            profileInitial={userId === TEACHER_ID ? "P" : "E"}
-            // profileInitial={currentUserId[0].toUpperCase()} // Usa a inicial do ID do usuário logado
-          />
+      <div className="container mx-auto">
+        <Button
+          href={`/curso/${courseId}`}
+          variant="gray-50"
+          className="flex border-0 w-fit items-center gap-2 mb-4"
+        >
+          <ArrowIcon className="size-4" />
+          <span>Voltar para Meus Cursos</span>
+        </Button>
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-white p-4 rounded-lg shadow-md mb-4">
+            <CreateComment
+              placeholder="Escreva um aviso para sua turma"
+              onPublish={handleNewAnnouncementPublish}
+              profileInitial={userId === TEACHER_ID ? "P" : "E"}
+              // profileInitial={currentUserId[0].toUpperCase()} // Usa a inicial do ID do usuário logado
+            />
+          </div>
+          {posts.map((announcement) => (
+            <AnnouncementPost
+              post={announcement}
+              key={announcement.id}
+              handleUpdatePost={handleUpdatePost}
+              handleDeletePost={handleDeletePost}
+              userId={userId}
+            />
+          ))}
+          {posts.length === 0 && !loading && !error && (
+            <p className="text-center text-gray-500 mt-8">
+              Nenhuma postagem encontrada para este curso.
+            </p>
+          )}
         </div>
-        {posts.map((announcement) => (
-          <AnnouncementPost
-            post={announcement}
-            key={announcement.id}
-            handleUpdatePost={handleUpdatePost}
-            handleDeletePost={handleDeletePost}
-            userId={userId}
-          />
-        ))}
-        {posts.length === 0 && !loading && !error && (
-          <p className="text-center text-gray-500 mt-8">
-            Nenhuma postagem encontrada para este curso.
-          </p>
-        )}
       </div>
     </div>
   );
