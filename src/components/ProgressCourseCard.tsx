@@ -74,7 +74,7 @@ export function ProgressCourseCard({
             Prof. {course.professor?.name}
           </p>
 
-          <p className="text-gray-800 text-sm line-clamp-3 mb-4">
+          <p className="text-gray-500 h-16 font-normal text-sm line-clamp-3 mb-4">
             {course.description}
           </p>
 
@@ -94,7 +94,11 @@ export function ProgressCourseCard({
           </div>
 
           <div className="mt-4 pt-4">
-            {progressRate > 0 ? (
+            {progressRate === 100 ? (
+              <span className="px-2 py-0.5 text-sm bg-green-100 text-green-800 rounded-lg">
+                Concluído
+              </span>
+            ) : progressRate > 0 ? (
               <span className="px-2 py-0.5 text-sm bg-blue-100 text-blue-950 rounded-lg">
                 Em andamento
               </span>
