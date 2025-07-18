@@ -4,6 +4,7 @@ import { PrismaNotificationRepository } from "@/framework/repositories/prisma-no
 import { errorHandler } from "@/shared/http-handler";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
+import { NextRequest } from "next/server";
 
 export class NotificationController {
   private notificationUseCase: NotificationUseCase;
@@ -14,8 +15,21 @@ export class NotificationController {
     );
   }
 
-  async list(userId: string) {
+  async list(req: NextRequest) {
     try {
+      const userId = req.nextUrl.searchParams.get("userId");
+
+      if (!userId) {
+        return errorHandler([
+          {
+            property: "userId",
+            constraints: {
+              isNotEmpty: "userId é necessário",
+            },
+          },
+        ]);
+      }
+
       const dto = plainToInstance(InputListNotificationsDto, { userId });
       const errors = await validate(dto);
 
@@ -37,8 +51,21 @@ export class NotificationController {
     }
   }
 
-  async read(userId: string, notificationId: string) {
+  async read(req: NextRequest, notificationId: string) {
     try {
+      const userId = req.nextUrl.searchParams.get("userId");
+
+      if (!userId) {
+        return errorHandler([
+          {
+            property: "userId",
+            constraints: {
+              isNotEmpty: "userId é necessário",
+            },
+          },
+        ]);
+      }
+
       const dto = plainToInstance(InputReadNotificationDto, { userId, notificationId });
       const errors = await validate(dto);
 
@@ -47,7 +74,7 @@ export class NotificationController {
       const notifications = await this.notificationUseCase.read(dto);
 
       return new Response(JSON.stringify(notifications), {
-        status: 200,
+        status: 204,
         headers: {
           "Content-Type": "application/json",
         },

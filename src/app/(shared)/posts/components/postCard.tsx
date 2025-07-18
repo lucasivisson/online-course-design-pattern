@@ -4,9 +4,10 @@ import { TransformedPost } from "@/app/hooks/usePosts";
 type PostProps = {
   post: TransformedPost;
   handleDeletePost: (id: string) => void;
+  userId: string | null;
 };
 
-const PostCard: React.FC<PostProps> = ({ post, handleDeletePost }) => {
+const PostCard: React.FC<PostProps> = ({ post, handleDeletePost, userId }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleDelete = async () => {
@@ -21,7 +22,7 @@ const PostCard: React.FC<PostProps> = ({ post, handleDeletePost }) => {
   };
 
   return (
-    <div className="rounded-lg p-4 mb-4 relative">
+    <div className="rounded-lg mb-4 relative">
       <div className="flex justify-between items-center">
         <div className="relative">
           <button
@@ -29,7 +30,7 @@ const PostCard: React.FC<PostProps> = ({ post, handleDeletePost }) => {
             onClick={() =>
               // TODO: Adjust to get correct id later
               setIsDropdownOpen((prev) =>
-                post.authorId === "687281a5869b62998f6a72c3" ? !prev : prev
+                post.authorId === userId ? !prev : prev
               )
             }
           >
