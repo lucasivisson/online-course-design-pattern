@@ -1,14 +1,10 @@
 "use client";
 import { api } from "@/config/api";
+import { QuizEntity } from "@/entities/quiz-entity";
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
 import toast from "react-hot-toast";
-
-interface Quiz {
-  id: string;
-  title: string;
-}
 
 export default function CreateClassPage() {
   const router = useRouter();
@@ -19,7 +15,7 @@ export default function CreateClassPage() {
   const [selectedCategory, setSelectedCategory] = useState(
     "Selecione um tipo de aula"
   );
-  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [quizzes, setQuizzes] = useState<QuizEntity[]>([]);
   const [isLoadingQuizzes, setIsLoadingQuizzes] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -41,7 +37,7 @@ export default function CreateClassPage() {
   const fetchQuizzes = async () => {
     setIsLoadingQuizzes(true);
     try {
-      const response = await api.get<{ quiz: Quiz[] }>("/api/quiz");
+      const response = await api.get<{ quiz: QuizEntity[] }>("/api/quiz");
 
       setQuizzes(response.quiz);
     } catch (error) {
@@ -300,7 +296,7 @@ export default function CreateClassPage() {
                   </option>
                   {quizzes.map((quiz) => (
                     <option key={quiz.id} value={quiz.id}>
-                      {quiz.title}
+                      {quiz.name}
                     </option>
                   ))}
                 </select>

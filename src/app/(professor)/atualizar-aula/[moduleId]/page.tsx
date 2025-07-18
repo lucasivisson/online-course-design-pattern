@@ -75,8 +75,8 @@ export default function UpdateClassPage() {
   const fetchQuizzes = async () => {
     setIsLoadingQuizzes(true);
     try {
-      const response = await api.get<QuizEntity[]>("/api/quiz");
-      setQuizzes(response);
+      const response = await api.get<{ quiz: QuizEntity[] }>("/api/quiz");
+      setQuizzes(response.quiz);
     } catch (error) {
       toast.error("Erro ao carregar quizzes");
       console.error("Failed to fetch quizzes:", error);
